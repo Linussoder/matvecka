@@ -49,8 +49,8 @@ export default async function ProductsPage() {
           <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-800">
               <strong>Veckans erbjudanden:</strong> {formatDate(latestWeek.start_date)} - {formatDate(latestWeek.end_date)}
-              {latestWeek.stores && (
-                <> från <strong>{latestWeek.stores.name}</strong> ({latestWeek.stores.city})</>
+              {latestWeek.stores?.[0] && (
+                <> från <strong>{latestWeek.stores[0].name}</strong> ({latestWeek.stores[0].city})</>
               )}
             </p>
           </div>
