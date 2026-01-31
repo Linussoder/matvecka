@@ -2,24 +2,50 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 3600
 
 export default async function ProductsPage() {
-  // Get most recent week
-  const { data: latestWeek } = await supabase
-    .from('weeks')
-    .select('id, start_date, end_date, store_id, stores(name, chain, city)')
-    .order('start_date', { ascending: false })
-    .limit(1)
-    .single()
+  let latestWeek: any = null
+  let products: any[] | null = null
+  let error: string | null = null
 
-  // Get products from that week
-  const { data: products } = await supabase
-    .from('products')
-    .select('*')
-    .eq('week_id', latestWeek?.id)
-    .order('price', { ascending: true })
-    .limit(50) // Show top 50 deals
+  try {
+    // Get most recent week
+    const { data: weekData, error: weekError } = await supabase
+      .from('weeks')
+      .select('id, start_date, end_date, store_id, stores(name, chain, city)')
+      .order('start_date', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (weekError) {
+      console.error('Week fetch error:', weekError)
+      error = 'Kunde inte hämta veckodata: ' + weekError.message
+    } else {
+      latestWeek = weekData
+    }
+
+    // Get products from that week
+    if (latestWeek) {
+      const { data: productData, error: productError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('week_id', latestWeek.id)
+        .order('price', { ascending: true })
+        .limit(50)
+
+      if (productError) {
+        console.error('Product fetch error:', productError)
+        error = 'Kunde inte hämta produkter: ' + productError.message
+      } else {
+        products = productData
+      }
+    }
+
+  } catch (err: any) {
+    console.error('Page error:', err)
+    error = 'Ett fel uppstod: ' + err.message
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,6 +70,15 @@ export default async function ProductsPage() {
       </header>
 
       <main className="container mx-auto px-4 py-12">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800">
+              <strong>Fel:</strong> {error}
+            </p>
+          </div>
+        )}
+
         {/* Week Info */}
         {latestWeek && (
           <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -62,17 +97,23 @@ export default async function ProductsPage() {
         </p>
 
         {/* Products Grid */}
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products?.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        {(!products || products.length === 0) && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
+        {products && products.length > 0 ? (
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <div className="text-6xl mb-4">📦</div>
+            <p className="text-gray-500 text-lg mb-4">
               Inga produkter hittades. Kör scraper för att ladda erbjudanden.
             </p>
+            <div className="text-sm text-gray-400 space-y-1">
+              <p>Debug info:</p>
+              <p>Latest week: {latestWeek ? 'Found' : 'Not found'}</p>
+              <p>Products count: {products?.length || 0}</p>
+            </div>
           </div>
         )}
       </main>
