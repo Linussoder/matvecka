@@ -9,12 +9,20 @@ export default function Home() {
           <div className="text-2xl font-bold text-green-600">
             🛒 Matvecka
           </div>
-          <Link
-            href="/login"
-            className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
-          >
-            Logga in
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/recipes"
+              className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
+            >
+              Recept
+            </Link>
+            <Link
+              href="/login"
+              className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
+            >
+              Logga in
+            </Link>
+          </div>
         </nav>
       </header>
 
