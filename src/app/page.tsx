@@ -17,6 +17,12 @@ export default function Home() {
               Recept
             </Link>
             <Link
+              href="/products"
+              className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
+            >
+              Erbjudanden
+            </Link>
+            <Link
               href="/login"
               className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
             >
