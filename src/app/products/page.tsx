@@ -22,11 +22,14 @@ export default async function ProductsPage() {
       .select('id, start_date, end_date, store_id, stores(name, chain, city)')
       .order('start_date', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (weekError) {
       console.error('Week fetch error:', weekError)
       error = 'Kunde inte hämta veckodata: ' + weekError.message
+    } else if (!weekData) {
+      // No weeks in database yet
+      error = null // Not an error, just no data
     } else {
       latestWeek = weekData
     }
