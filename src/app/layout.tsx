@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShoppingListProvider } from "@/contexts/ShoppingListContext";
+import { FavoritesProvider } from "@/lib/FavoritesContext";
 import FloatingCart from "@/components/FloatingCart";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import { ServiceWorkerProvider } from "@/hooks/useServiceWorker";
@@ -96,11 +97,13 @@ export default function RootLayout({
       >
         <ServiceWorkerProvider>
           <ShoppingListProvider>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <FloatingCart />
-            <PWAInstallPrompt />
+            <FavoritesProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <FloatingCart />
+              <PWAInstallPrompt />
+            </FavoritesProvider>
           </ShoppingListProvider>
         </ServiceWorkerProvider>
         <Analytics />
