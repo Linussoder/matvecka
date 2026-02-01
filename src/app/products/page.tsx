@@ -1,5 +1,4 @@
-import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import Image from 'next/image'
 
 export const revalidate = 3600
@@ -11,7 +10,7 @@ export default async function ProductsPage() {
 
   try {
     // Get most recent week
-    const { data: weekData, error: weekError } = await supabase
+    const { data: weekData, error: weekError } = await supabaseAdmin
       .from('weeks')
       .select('id, start_date, end_date, store_id, stores(name, chain, city)')
       .order('start_date', { ascending: false })
@@ -27,7 +26,7 @@ export default async function ProductsPage() {
 
     // Get products from that week
     if (latestWeek) {
-      const { data: productData, error: productError } = await supabase
+      const { data: productData, error: productError } = await supabaseAdmin
         .from('products')
         .select('*')
         .eq('week_id', latestWeek.id)
@@ -49,26 +48,6 @@ export default async function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            Matvecka
-          </Link>
-          <nav className="flex gap-6">
-            <Link href="/stores" className="text-gray-600 hover:text-green-600">
-              Butiker
-            </Link>
-            <Link href="/recipes" className="text-gray-600 hover:text-green-600">
-              Recept
-            </Link>
-            <Link href="/products" className="text-green-600 font-medium">
-              Erbjudanden
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-12">
         {/* Error Message */}
         {error && (

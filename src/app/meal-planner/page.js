@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function MealPlannerPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [mealPlan, setMealPlan] = useState(null)
   const [error, setError] = useState(null)
@@ -20,32 +21,21 @@ export default function MealPlannerPage() {
     setMealPlan(null)
 
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 min timeout
-
       const response = await fetch('/api/meal-plan/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferences),
-        signal: controller.signal
+        body: JSON.stringify(preferences)
       })
 
-      clearTimeout(timeoutId)
+      const data = await response.json()
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `Server error: ${response.status}`)
+        throw new Error(data.error || 'Failed to generate meal plan')
       }
 
-      const data = await response.json()
       setMealPlan(data)
     } catch (err) {
-      if (err.name === 'AbortError') {
-        setError('Timeout - försök igen')
-      } else {
-        setError(err.message || 'Ett fel uppstod')
-      }
-      console.error('Meal plan error:', err)
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -53,29 +43,9 @@ export default function MealPlannerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            Matvecka
-          </Link>
-          <nav className="flex gap-6">
-            <Link href="/stores" className="text-gray-600 hover:text-green-600">
-              Butiker
-            </Link>
-            <Link href="/products" className="text-gray-600 hover:text-green-600">
-              Erbjudanden
-            </Link>
-            <Link href="/meal-planner" className="text-green-600 font-medium">
-              Matplanering
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2">AI Matplanering</h1>
+          <h1 className="text-4xl font-bold mb-2">Smart Matplanering</h1>
           <p className="text-gray-600 mb-8">
             Skapa en veckas matplan baserat på veckans bästa erbjudanden
           </p>
@@ -155,7 +125,7 @@ export default function MealPlannerPage() {
               disabled={loading}
               className="mt-6 w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Genererar matplan...' : 'Skapa 3-dagars matplan'}
+              {loading ? 'Skapar matplan...' : 'Skapa 7-dagars matplan'}
             </button>
           </div>
 
@@ -163,8 +133,8 @@ export default function MealPlannerPage() {
           {loading && (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <div className="animate-pulse text-6xl mb-4">...</div>
-              <p className="text-lg text-gray-600">AI skapar din personliga matplan...</p>
-              <p className="text-sm text-gray-500 mt-2">Detta kan ta upp till 60 sekunder</p>
+              <p className="text-lg text-gray-600">Skapar din personliga matplan...</p>
+              <p className="text-sm text-gray-500 mt-2">Detta tar cirka 20-30 sekunder</p>
             </div>
           )}
 
@@ -208,16 +178,23 @@ export default function MealPlannerPage() {
                 ))}
               </div>
 
-              {/* Shopping List Button */}
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+              {/* Action Buttons */}
+              <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={() => {
-                    // TODO: Navigate to shopping list page
-                    alert('Inköpslista kommer snart!')
-                  }}
-                  className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                  onClick={() => router.push(`/shopping-list/${mealPlan.mealPlanId}`)}
+                  className="flex-1 px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
                   Visa inköpslista
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm('Vill du skapa en ny matplan?')) {
+                      setMealPlan(null)
+                    }
+                  }}
+                  className="px-8 py-4 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Skapa ny plan
                 </button>
               </div>
             </div>

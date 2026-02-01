@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
 import Image from 'next/image'
 
 interface Recipe {
@@ -21,14 +20,6 @@ export default async function RecipesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            🛒 Matvecka
-          </Link>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">Receptförslag</h1>
         <p className="text-gray-600 mb-8">

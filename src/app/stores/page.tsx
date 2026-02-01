@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
 
 interface Store {
   id: string
@@ -21,16 +20,6 @@ export default async function StoresPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            🛒 Matvecka
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           Våra Butiker
