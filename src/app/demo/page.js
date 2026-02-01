@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 
 // Sample data - looks like real generated content
@@ -11,411 +14,794 @@ const sampleMealPlan = {
       day: 1,
       dayName: 'Måndag',
       name: 'Krämig kycklingpasta',
-      description: 'Saftig kyckling i en krämig sås med pasta och grönsaker',
+      description: 'Saftig kyckling i en krämig sås med pasta och grönsaker - perfekt vardagsmat som går snabbt att laga.',
       prepTime: '15 min',
       cookTime: '25 min',
       servings: 4,
       estimatedCost: 112,
+      costPerServing: 28,
       difficulty: 'Lätt',
+      image: '🍝',
       ingredients: [
-        { name: 'Kycklingfilé', amount: '600', unit: 'g' },
-        { name: 'Pasta penne', amount: '400', unit: 'g' },
-        { name: 'Grädde', amount: '2', unit: 'dl' },
-        { name: 'Gul lök', amount: '1', unit: 'st' },
-        { name: 'Vitlök', amount: '2', unit: 'klyftor' },
-        { name: 'Spenat', amount: '100', unit: 'g' },
+        { name: 'Kycklingfilé', amount: '600', unit: 'g', isFromOffer: true },
+        { name: 'Pasta penne', amount: '400', unit: 'g', isFromOffer: true },
+        { name: 'Grädde', amount: '2', unit: 'dl', isFromOffer: false },
+        { name: 'Gul lök', amount: '1', unit: 'st', isFromOffer: true },
+        { name: 'Vitlök', amount: '2', unit: 'klyftor', isFromOffer: false },
+        { name: 'Spenat', amount: '100', unit: 'g', isFromOffer: true },
+        { name: 'Olivolja', amount: '2', unit: 'msk', isFromOffer: false },
+        { name: 'Salt och peppar', amount: '', unit: 'efter smak', isFromOffer: false },
       ],
       instructions: [
-        'Koka pastan enligt förpackningen',
-        'Skär kycklingen i bitar och stek i smör',
-        'Tillsätt hackad lök och vitlök',
-        'Häll i grädden och låt sjuda 5 min',
-        'Vänd ner spenaten och servera med pastan',
+        'Koka pastan enligt förpackningens anvisningar i saltat vatten.',
+        'Skär kycklingfilén i ca 2 cm stora bitar. Krydda med salt och peppar.',
+        'Hetta upp olivolja i en stor stekpanna på medelhög värme.',
+        'Stek kycklingbitarna i 5-6 minuter tills de är genomstekta och gyllene. Lägg åt sidan.',
+        'I samma panna, fräs hackad lök i 2-3 minuter tills den mjuknat.',
+        'Tillsätt pressad vitlök och fräs ytterligare 30 sekunder.',
+        'Häll i grädden och låt sjuda på låg värme i 3-4 minuter.',
+        'Lägg tillbaka kycklingen i pannan tillsammans med spenaten.',
+        'Rör om tills spenaten sjunkit ihop, ca 1-2 minuter.',
+        'Smaka av med salt och peppar. Servera över den nykokta pastan.',
       ],
+      tips: 'Toppa med riven parmesan för extra smak! Du kan också tillsätta soltorkade tomater eller champinjoner.',
     },
     {
       day: 2,
       dayName: 'Tisdag',
-      name: 'Laxfilé med potatismos',
-      description: 'Ugnsbakad lax med krämigt potatismos och citron',
+      name: 'Ugnsbakad lax med potatismos',
+      description: 'Elegant men enkel rätt med saftig lax och krämigt potatismos. Perfekt för en lite lyxigare vardag.',
       prepTime: '10 min',
       cookTime: '20 min',
       servings: 4,
       estimatedCost: 145,
+      costPerServing: 36,
       difficulty: 'Lätt',
+      image: '🐟',
       ingredients: [
-        { name: 'Laxfilé', amount: '600', unit: 'g' },
-        { name: 'Potatis', amount: '800', unit: 'g' },
-        { name: 'Smör', amount: '50', unit: 'g' },
-        { name: 'Mjölk', amount: '1', unit: 'dl' },
-        { name: 'Citron', amount: '1', unit: 'st' },
-        { name: 'Dill', amount: '1', unit: 'knippe' },
+        { name: 'Laxfilé', amount: '600', unit: 'g', isFromOffer: true },
+        { name: 'Potatis', amount: '800', unit: 'g', isFromOffer: true },
+        { name: 'Smör', amount: '50', unit: 'g', isFromOffer: false },
+        { name: 'Mjölk', amount: '1', unit: 'dl', isFromOffer: false },
+        { name: 'Citron', amount: '1', unit: 'st', isFromOffer: false },
+        { name: 'Färsk dill', amount: '1', unit: 'knippe', isFromOffer: false },
+        { name: 'Salt och peppar', amount: '', unit: 'efter smak', isFromOffer: false },
       ],
       instructions: [
-        'Sätt ugnen på 200°C',
-        'Koka potatisen mjuk och mosa med smör och mjölk',
-        'Lägg laxen på en plåt, salta och peppra',
-        'Baka laxen i 15-18 min',
-        'Servera med citron och dill',
+        'Sätt ugnen på 200°C.',
+        'Skala potatisen och skär i jämna bitar. Koka i saltat vatten ca 15-20 minuter.',
+        'Lägg laxfiléerna på en bakplåtspappersklädd plåt.',
+        'Krydda laxen med salt, peppar och en skvätt citronjuice.',
+        'Baka i ugnen i 12-15 minuter beroende på tjocklek.',
+        'När potatisen är mjuk, häll av vattnet och mosa med smör och mjölk.',
+        'Smaka av potatismoset med salt och peppar.',
+        'Servera laxen på en bädd av potatismos, toppa med färsk dill och citronklyftor.',
       ],
+      tips: 'Vill du ha extra krispig lax? Grilla på högsta värme sista 2 minuterna!',
     },
     {
       day: 3,
       dayName: 'Onsdag',
-      name: 'Köttfärssås med spagetti',
-      description: 'Klassisk italiensk köttfärssås med färska tomater',
+      name: 'Klassisk köttfärssås med spagetti',
+      description: 'Familjefavoriten som alltid uppskattas. Långkok gör såsen extra smakrik.',
       prepTime: '15 min',
       cookTime: '30 min',
       servings: 4,
       estimatedCost: 89,
+      costPerServing: 22,
       difficulty: 'Lätt',
+      image: '🍝',
       ingredients: [
-        { name: 'Nötfärs', amount: '500', unit: 'g' },
-        { name: 'Spagetti', amount: '400', unit: 'g' },
-        { name: 'Krossade tomater', amount: '400', unit: 'g' },
-        { name: 'Gul lök', amount: '1', unit: 'st' },
-        { name: 'Morot', amount: '1', unit: 'st' },
-        { name: 'Parmesan', amount: '50', unit: 'g' },
+        { name: 'Nötfärs', amount: '500', unit: 'g', isFromOffer: true },
+        { name: 'Spagetti', amount: '400', unit: 'g', isFromOffer: true },
+        { name: 'Krossade tomater', amount: '400', unit: 'g', isFromOffer: true },
+        { name: 'Gul lök', amount: '1', unit: 'st', isFromOffer: true },
+        { name: 'Morot', amount: '1', unit: 'st', isFromOffer: true },
+        { name: 'Vitlök', amount: '2', unit: 'klyftor', isFromOffer: false },
+        { name: 'Tomatpuré', amount: '2', unit: 'msk', isFromOffer: false },
+        { name: 'Parmesan', amount: '50', unit: 'g', isFromOffer: false },
+        { name: 'Olivolja', amount: '2', unit: 'msk', isFromOffer: false },
+        { name: 'Italienska örter', amount: '1', unit: 'tsk', isFromOffer: false },
       ],
       instructions: [
-        'Hacka lök och morot fint',
-        'Stek färsen tills den fått färg',
-        'Tillsätt grönsaker och tomater',
-        'Låt sjuda 20 min',
-        'Servera med kokt pasta och riven parmesan',
+        'Hacka löken och moroten fint. Pressa vitlöken.',
+        'Hetta upp olivolja i en stor kastrull.',
+        'Fräs lök och morot på medelvärme i 5 minuter.',
+        'Tillsätt vitlöken och fräs 1 minut till.',
+        'Höj värmen och tillsätt köttfärsen. Bryn tills den fått färg.',
+        'Rör ner tomatpurén och låt fräsa 1 minut.',
+        'Tillsätt krossade tomater och örter. Rör om väl.',
+        'Sänk värmen och låt sjuda utan lock i 20-25 minuter.',
+        'Koka spagetin enligt förpackningen.',
+        'Smaka av såsen med salt och peppar. Servera med riven parmesan.',
       ],
+      tips: 'Tillsätt en nypa socker om tomatsåsen känns för syrlig. Såsen blir ännu godare om den får stå till nästa dag!',
     },
     {
       day: 4,
       dayName: 'Torsdag',
-      name: 'Vegetarisk curry',
-      description: 'Smakrik curry med kikärtor och kokosmjölk',
+      name: 'Vegetarisk kikärtscurry',
+      description: 'Smakrik och mättande curry som är både nyttig och prisvärd. Perfekt för köttfria dagar.',
       prepTime: '10 min',
       cookTime: '25 min',
       servings: 4,
       estimatedCost: 78,
+      costPerServing: 20,
       difficulty: 'Lätt',
+      image: '🍛',
       ingredients: [
-        { name: 'Kikärtor', amount: '400', unit: 'g' },
-        { name: 'Kokosmjölk', amount: '400', unit: 'ml' },
-        { name: 'Curry', amount: '2', unit: 'msk' },
-        { name: 'Basmatiris', amount: '300', unit: 'g' },
-        { name: 'Spenat', amount: '100', unit: 'g' },
-        { name: 'Tomat', amount: '2', unit: 'st' },
+        { name: 'Kikärtor (burk)', amount: '400', unit: 'g', isFromOffer: true },
+        { name: 'Kokosmjölk', amount: '400', unit: 'ml', isFromOffer: true },
+        { name: 'Currypasta', amount: '2', unit: 'msk', isFromOffer: false },
+        { name: 'Basmatiris', amount: '300', unit: 'g', isFromOffer: true },
+        { name: 'Färsk spenat', amount: '100', unit: 'g', isFromOffer: true },
+        { name: 'Tomat', amount: '2', unit: 'st', isFromOffer: true },
+        { name: 'Gul lök', amount: '1', unit: 'st', isFromOffer: true },
+        { name: 'Ingefära', amount: '1', unit: 'tsk', isFromOffer: false },
+        { name: 'Koriander (valfritt)', amount: '', unit: 'för topping', isFromOffer: false },
       ],
       instructions: [
-        'Stek currypastan i olja',
-        'Tillsätt kikärtor och kokosmjölk',
-        'Låt sjuda 15 min',
-        'Vänd ner spenat och tomat',
-        'Servera med kokt ris',
+        'Koka riset enligt förpackningens anvisningar.',
+        'Hacka löken och tärna tomaterna.',
+        'Fräs löken i olja tills den mjuknat.',
+        'Tillsätt currypasta och riven ingefära, fräs 1 minut.',
+        'Häll i kokosmjölken och rör om väl.',
+        'Skölj kikärtorna och tillsätt i pannan.',
+        'Låt sjuda på medelvärme i 15 minuter.',
+        'Tillsätt tomaterna och spenaten, låt värmas genom.',
+        'Smaka av med salt och servera med ris.',
+        'Toppa med färsk koriander om du önskar.',
       ],
+      tips: 'Vill du ha mer hetta? Tillsätt en hackad chili eller lite sambal oelek.',
     },
     {
       day: 5,
       dayName: 'Fredag',
-      name: 'Fish and chips',
-      description: 'Krispig torsk med pommes och hemgjord remoulad',
+      name: 'Panerad fisk med pommes',
+      description: 'Fredagsmys på riktigt! Krispig fisk med gyllene pommes och hemgjord remouladsås.',
       prepTime: '20 min',
       cookTime: '30 min',
       servings: 4,
       estimatedCost: 125,
+      costPerServing: 31,
       difficulty: 'Medel',
+      image: '🍟',
       ingredients: [
-        { name: 'Torskfilé', amount: '600', unit: 'g' },
-        { name: 'Potatis', amount: '800', unit: 'g' },
-        { name: 'Vetemjöl', amount: '1', unit: 'dl' },
-        { name: 'Ägg', amount: '2', unit: 'st' },
-        { name: 'Ströbröd', amount: '2', unit: 'dl' },
-        { name: 'Majonnäs', amount: '2', unit: 'dl' },
+        { name: 'Torskfilé', amount: '600', unit: 'g', isFromOffer: true },
+        { name: 'Potatis', amount: '800', unit: 'g', isFromOffer: true },
+        { name: 'Vetemjöl', amount: '1', unit: 'dl', isFromOffer: false },
+        { name: 'Ägg', amount: '2', unit: 'st', isFromOffer: true },
+        { name: 'Ströbröd', amount: '2', unit: 'dl', isFromOffer: false },
+        { name: 'Majonnäs', amount: '2', unit: 'dl', isFromOffer: false },
+        { name: 'Saltgurka', amount: '2', unit: 'st', isFromOffer: false },
+        { name: 'Citron', amount: '1', unit: 'st', isFromOffer: false },
+        { name: 'Olja för stekning', amount: '', unit: 'efter behov', isFromOffer: false },
       ],
       instructions: [
-        'Skär potatisen i stavar och fritera eller ugnsgrädda',
-        'Panera fisken i mjöl, ägg och ströbröd',
-        'Stek fisken gyllene på båda sidor',
-        'Blanda majonnäs med hackad gurka till remoulad',
-        'Servera med citronklyftor',
+        'Sätt ugnen på 225°C för pommesen.',
+        'Skär potatisen i stavar, lägg på plåt med olja, salt och peppar.',
+        'Rosta i ugnen ca 25-30 minuter, vänd halvvägs.',
+        'Skär fisken i portionsbitar.',
+        'Ställ fram tre djupa tallrikar: mjöl, vispat ägg, och ströbröd.',
+        'Doppa fisken först i mjöl, sedan ägg, sist ströbröd.',
+        'Stek fisken i rikligt med olja, ca 3-4 min per sida.',
+        'Blanda majonnäs med finhackad saltgurka till remouladsås.',
+        'Servera fisken med pommes, remoulad och citronklyftor.',
       ],
+      tips: 'Lägg fisken på hushållspapper efter stekning för att få bort överflödig olja.',
     },
     {
       day: 6,
       dayName: 'Lördag',
-      name: 'Tacos med nötfärs',
-      description: 'Fredagsmys-klassikern med alla tillbehör',
+      name: 'Tacofredag (på lördag!)',
+      description: 'Klassisk tacos med allt tillbehör. Låt alla bygga sina egna - kul för hela familjen!',
       prepTime: '20 min',
       cookTime: '15 min',
       servings: 4,
       estimatedCost: 135,
+      costPerServing: 34,
       difficulty: 'Lätt',
+      image: '🌮',
       ingredients: [
-        { name: 'Nötfärs', amount: '500', unit: 'g' },
-        { name: 'Tacokrydda', amount: '1', unit: 'påse' },
-        { name: 'Tacoskal', amount: '12', unit: 'st' },
-        { name: 'Tomat', amount: '3', unit: 'st' },
-        { name: 'Sallad', amount: '1', unit: 'st' },
-        { name: 'Riven ost', amount: '200', unit: 'g' },
+        { name: 'Nötfärs', amount: '500', unit: 'g', isFromOffer: true },
+        { name: 'Tacokrydda', amount: '1', unit: 'påse', isFromOffer: false },
+        { name: 'Tacoskal', amount: '12', unit: 'st', isFromOffer: true },
+        { name: 'Tomat', amount: '3', unit: 'st', isFromOffer: true },
+        { name: 'Isbergssallad', amount: '1', unit: 'st', isFromOffer: true },
+        { name: 'Riven ost', amount: '200', unit: 'g', isFromOffer: true },
+        { name: 'Gräddfil', amount: '2', unit: 'dl', isFromOffer: false },
+        { name: 'Salsa', amount: '1', unit: 'burk', isFromOffer: false },
+        { name: 'Avokado', amount: '1', unit: 'st', isFromOffer: false },
       ],
       instructions: [
-        'Stek färsen och tillsätt tacokrydda',
-        'Hacka tomat och strimla salladen',
-        'Värm tacoskalen i ugnen',
-        'Ställ fram alla tillbehör',
-        'Låt alla bygga sina egna tacos',
+        'Stek köttfärsen i en stekpanna tills den är genomstekt.',
+        'Tillsätt tacokrydda och vatten enligt förpackningen.',
+        'Låt sjuda 5 minuter.',
+        'Hacka tomater i tärningar.',
+        'Strimla isbergssalladen fint.',
+        'Gör guacamole av mosad avokado, salt, lime och vitlök.',
+        'Värm tacoskalen i ugnen på 175°C i några minuter.',
+        'Ställ fram allt tillbehör i skålar.',
+        'Låt alla bygga sina egna tacos!',
       ],
+      tips: 'Servera med nachochips och extra salsa som förrätt medan du förbereder resten.',
     },
     {
       day: 7,
       dayName: 'Söndag',
-      name: 'Ugnsstekt kyckling',
-      description: 'Hel kyckling med rostad potatis och sky',
+      name: 'Helstekt kyckling med rostade grönsaker',
+      description: 'Söndagsmiddag när den är som bäst. Saftig kyckling med krispigt skinn och rostade rotfrukter.',
       prepTime: '15 min',
       cookTime: '60 min',
       servings: 4,
       estimatedCost: 163,
+      costPerServing: 41,
       difficulty: 'Medel',
+      image: '🍗',
       ingredients: [
-        { name: 'Hel kyckling', amount: '1.5', unit: 'kg' },
-        { name: 'Potatis', amount: '800', unit: 'g' },
-        { name: 'Morot', amount: '4', unit: 'st' },
-        { name: 'Citron', amount: '1', unit: 'st' },
-        { name: 'Rosmarin', amount: '2', unit: 'kvistar' },
-        { name: 'Smör', amount: '50', unit: 'g' },
+        { name: 'Hel kyckling', amount: '1.5', unit: 'kg', isFromOffer: true },
+        { name: 'Potatis', amount: '600', unit: 'g', isFromOffer: true },
+        { name: 'Morötter', amount: '4', unit: 'st', isFromOffer: true },
+        { name: 'Palsternacka', amount: '2', unit: 'st', isFromOffer: false },
+        { name: 'Citron', amount: '1', unit: 'st', isFromOffer: false },
+        { name: 'Färsk rosmarin', amount: '3', unit: 'kvistar', isFromOffer: false },
+        { name: 'Vitlök', amount: '1', unit: 'hel', isFromOffer: false },
+        { name: 'Smör', amount: '50', unit: 'g', isFromOffer: false },
+        { name: 'Kycklingfond', amount: '2', unit: 'dl', isFromOffer: false },
       ],
       instructions: [
-        'Sätt ugnen på 200°C',
-        'Gnid in kycklingen med smör och kryddor',
-        'Lägg citron och rosmarin i kycklingen',
-        'Stek i ugnen ca 1 timme',
-        'Låt vila 10 min innan servering',
+        'Ta ut kycklingen ur kylen 30 minuter innan tillagning.',
+        'Sätt ugnen på 200°C.',
+        'Torka kycklingen torr med hushållspapper.',
+        'Gnid in kycklingen med mjukt smör, salt och peppar.',
+        'Stoppa citronhalvor, rosmarin och vitlök i kycklingens hålrum.',
+        'Skär rotfrukterna i bitar och lägg i en ugnsform.',
+        'Ringla olja över grönsakerna, salta och peppra.',
+        'Placera kycklingen ovanpå grönsakerna.',
+        'Stek i ugnen ca 1 timme (innertemp 75°C i låret).',
+        'Låt kycklingen vila 10 minuter under folie.',
+        'Koka ihop skyn med fond till sås.',
+        'Skär upp kycklingen och servera med grönsaker och sås.',
       ],
+      tips: 'Stek kycklingen bröst nedåt första halvan för extra saftigt bröst, vänd sedan.',
     },
   ],
 }
 
 const sampleShoppingList = [
-  { category: 'Kött & Fågel', items: [
-    { name: 'Kycklingfilé', amount: '600', unit: 'g' },
-    { name: 'Nötfärs', amount: '1000', unit: 'g' },
-    { name: 'Hel kyckling', amount: '1.5', unit: 'kg' },
-  ]},
-  { category: 'Fisk', items: [
-    { name: 'Laxfilé', amount: '600', unit: 'g' },
-    { name: 'Torskfilé', amount: '600', unit: 'g' },
-  ]},
-  { category: 'Grönsaker', items: [
-    { name: 'Potatis', amount: '2.4', unit: 'kg' },
-    { name: 'Gul lök', amount: '3', unit: 'st' },
-    { name: 'Morot', amount: '5', unit: 'st' },
-    { name: 'Spenat', amount: '200', unit: 'g' },
-    { name: 'Tomat', amount: '5', unit: 'st' },
-    { name: 'Sallad', amount: '1', unit: 'st' },
-  ]},
-  { category: 'Mejeri', items: [
-    { name: 'Grädde', amount: '2', unit: 'dl' },
-    { name: 'Smör', amount: '150', unit: 'g' },
-    { name: 'Mjölk', amount: '1', unit: 'dl' },
-    { name: 'Ägg', amount: '2', unit: 'st' },
-    { name: 'Riven ost', amount: '250', unit: 'g' },
-    { name: 'Parmesan', amount: '50', unit: 'g' },
-  ]},
-  { category: 'Skafferi', items: [
-    { name: 'Pasta penne', amount: '400', unit: 'g' },
-    { name: 'Spagetti', amount: '400', unit: 'g' },
-    { name: 'Basmatiris', amount: '300', unit: 'g' },
-    { name: 'Krossade tomater', amount: '400', unit: 'g' },
-    { name: 'Kikärtor', amount: '400', unit: 'g' },
-    { name: 'Kokosmjölk', amount: '400', unit: 'ml' },
-    { name: 'Tacoskal', amount: '12', unit: 'st' },
-  ]},
+  {
+    category: 'Kött & Fågel',
+    icon: '🥩',
+    color: 'bg-red-50 border-red-200',
+    items: [
+      { name: 'Kycklingfilé', amount: '600', unit: 'g', price: 89, isOffer: true },
+      { name: 'Nötfärs', amount: '1000', unit: 'g', price: 95, isOffer: true },
+      { name: 'Hel kyckling', amount: '1.5', unit: 'kg', price: 79, isOffer: true },
+    ]
+  },
+  {
+    category: 'Fisk & Skaldjur',
+    icon: '🐟',
+    color: 'bg-blue-50 border-blue-200',
+    items: [
+      { name: 'Laxfilé', amount: '600', unit: 'g', price: 119, isOffer: true },
+      { name: 'Torskfilé', amount: '600', unit: 'g', price: 99, isOffer: true },
+    ]
+  },
+  {
+    category: 'Grönsaker',
+    icon: '🥕',
+    color: 'bg-green-50 border-green-200',
+    items: [
+      { name: 'Potatis', amount: '2.4', unit: 'kg', price: 25, isOffer: true },
+      { name: 'Gul lök', amount: '4', unit: 'st', price: 8, isOffer: true },
+      { name: 'Morötter', amount: '6', unit: 'st', price: 12, isOffer: true },
+      { name: 'Spenat', amount: '200', unit: 'g', price: 20, isOffer: true },
+      { name: 'Tomater', amount: '5', unit: 'st', price: 25, isOffer: true },
+      { name: 'Isbergssallad', amount: '1', unit: 'st', price: 15, isOffer: true },
+      { name: 'Avokado', amount: '1', unit: 'st', price: 15, isOffer: false },
+      { name: 'Palsternacka', amount: '2', unit: 'st', price: 18, isOffer: false },
+    ]
+  },
+  {
+    category: 'Mejeri & Ägg',
+    icon: '🧈',
+    color: 'bg-yellow-50 border-yellow-200',
+    items: [
+      { name: 'Grädde', amount: '2', unit: 'dl', price: 18, isOffer: false },
+      { name: 'Smör', amount: '150', unit: 'g', price: 25, isOffer: false },
+      { name: 'Mjölk', amount: '1', unit: 'dl', price: 5, isOffer: false },
+      { name: 'Ägg', amount: '2', unit: 'st', price: 8, isOffer: true },
+      { name: 'Riven ost', amount: '250', unit: 'g', price: 35, isOffer: true },
+      { name: 'Parmesan', amount: '50', unit: 'g', price: 25, isOffer: false },
+      { name: 'Gräddfil', amount: '2', unit: 'dl', price: 15, isOffer: false },
+      { name: 'Kokosmjölk', amount: '400', unit: 'ml', price: 18, isOffer: true },
+    ]
+  },
+  {
+    category: 'Pasta, Ris & Bröd',
+    icon: '🍝',
+    color: 'bg-orange-50 border-orange-200',
+    items: [
+      { name: 'Pasta penne', amount: '400', unit: 'g', price: 15, isOffer: true },
+      { name: 'Spagetti', amount: '400', unit: 'g', price: 12, isOffer: true },
+      { name: 'Basmatiris', amount: '300', unit: 'g', price: 20, isOffer: true },
+      { name: 'Tacoskal', amount: '12', unit: 'st', price: 25, isOffer: true },
+      { name: 'Ströbröd', amount: '2', unit: 'dl', price: 12, isOffer: false },
+    ]
+  },
+  {
+    category: 'Konserver & Skafferi',
+    icon: '🥫',
+    color: 'bg-purple-50 border-purple-200',
+    items: [
+      { name: 'Krossade tomater', amount: '400', unit: 'g', price: 12, isOffer: true },
+      { name: 'Kikärtor', amount: '400', unit: 'g', price: 15, isOffer: true },
+      { name: 'Tacokrydda', amount: '1', unit: 'påse', price: 12, isOffer: false },
+      { name: 'Currypasta', amount: '2', unit: 'msk', price: 35, isOffer: false },
+      { name: 'Salsa', amount: '1', unit: 'burk', price: 25, isOffer: false },
+      { name: 'Tomatpuré', amount: '1', unit: 'tub', price: 15, isOffer: false },
+      { name: 'Majonnäs', amount: '2', unit: 'dl', price: 20, isOffer: false },
+    ]
+  },
 ]
 
 export default function DemoPage() {
+  const [activeTab, setActiveTab] = useState('recipes')
+  const [expandedRecipe, setExpandedRecipe] = useState(null)
+  const [checkedItems, setCheckedItems] = useState({})
+
+  const toggleRecipe = (day) => {
+    setExpandedRecipe(expandedRecipe === day ? null : day)
+  }
+
+  const toggleItem = (itemName) => {
+    setCheckedItems(prev => ({
+      ...prev,
+      [itemName]: !prev[itemName]
+    }))
+  }
+
+  const totalItems = sampleShoppingList.reduce((acc, cat) => acc + cat.items.length, 0)
+  const checkedCount = Object.values(checkedItems).filter(Boolean).length
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-8">
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-8 md:py-12">
         <div className="container mx-auto px-4 text-center">
-          <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm mb-4">
-            Exempelvy
-          </span>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Så här ser en matplan ut
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            Interaktivt exempel
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            Så här ser din matplan ut
           </h1>
-          <p className="text-green-100 max-w-2xl mx-auto">
-            Här är ett exempel på en genererad veckomeny med recept och inköpslista.
-            Skapa ett konto för att få din egen personliga matplan!
+          <p className="text-green-100 max-w-2xl mx-auto text-lg">
+            Utforska ett exempel på en komplett veckomeny med recept och inköpslista.
+            Klicka på recepten för att se alla detaljer!
           </p>
+
+          {/* Quick Stats */}
+          <div className="flex flex-wrap justify-center gap-6 mt-8">
+            <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+              <span className="text-2xl">📅</span>
+              <div className="text-left">
+                <p className="font-bold">7 dagar</p>
+                <p className="text-xs text-green-200">Komplett vecka</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+              <span className="text-2xl">💰</span>
+              <div className="text-left">
+                <p className="font-bold">847 kr</p>
+                <p className="text-xs text-green-200">Total kostnad</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+              <span className="text-2xl">👨‍👩‍👧‍👦</span>
+              <div className="text-left">
+                <p className="font-bold">4 pers</p>
+                <p className="text-xs text-green-200">Per måltid</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+              <span className="text-2xl">🏷️</span>
+              <div className="text-left">
+                <p className="font-bold">~30 kr</p>
+                <p className="text-xs text-green-200">Per portion</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-12">
-        {/* Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-            <p className="text-3xl font-bold text-green-600">7</p>
-            <p className="text-gray-600 text-sm">Dagar</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-            <p className="text-3xl font-bold text-green-600">847 kr</p>
-            <p className="text-gray-600 text-sm">Total kostnad</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-            <p className="text-3xl font-bold text-green-600">4</p>
-            <p className="text-gray-600 text-sm">Portioner/dag</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-sm">
-            <p className="text-3xl font-bold text-green-600">30 kr</p>
-            <p className="text-gray-600 text-sm">Per portion</p>
-          </div>
-        </div>
-
+      <main className="container mx-auto px-4 py-8">
         {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200">
-          <TabButton active={true}>Veckans recept</TabButton>
-          <TabButton active={false}>Inköpslista</TabButton>
+        <div className="flex gap-2 mb-8 bg-white p-2 rounded-xl shadow-sm max-w-md mx-auto">
+          <button
+            onClick={() => setActiveTab('recipes')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+              activeTab === 'recipes'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span>🍽️</span>
+            Veckans recept
+          </button>
+          <button
+            onClick={() => setActiveTab('shopping')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
+              activeTab === 'shopping'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span>🛒</span>
+            Inköpslista
+            {activeTab === 'shopping' && checkedCount > 0 && (
+              <span className="bg-white text-green-600 text-xs px-2 py-0.5 rounded-full">
+                {checkedCount}/{totalItems}
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Meal Plan Section */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Veckans matplan</h2>
+        {/* Recipes Tab */}
+        {activeTab === 'recipes' && (
+          <section className="mb-16">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Veckans matplan</h2>
+              <p className="text-sm text-gray-500">Klicka på ett recept för detaljer</p>
+            </div>
 
-          <div className="space-y-6">
-            {sampleMealPlan.recipes.map((recipe, index) => (
-              <RecipeCard key={index} recipe={recipe} />
-            ))}
-          </div>
-        </section>
+            <div className="space-y-4">
+              {sampleMealPlan.recipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.day}
+                  recipe={recipe}
+                  isExpanded={expandedRecipe === recipe.day}
+                  onToggle={() => toggleRecipe(recipe.day)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        {/* Shopping List Section */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Inköpslista</h2>
+        {/* Shopping List Tab */}
+        {activeTab === 'shopping' && (
+          <section className="mb-16">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Inköpslista</h2>
+                <p className="text-sm text-gray-500">
+                  {totalItems} varor - Klicka för att bocka av
+                </p>
+              </div>
+              {checkedCount > 0 && (
+                <button
+                  onClick={() => setCheckedItems({})}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Rensa alla
+                </button>
+              )}
+            </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+            {/* Progress Bar */}
+            <div className="bg-white rounded-xl p-4 shadow-sm mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Handlingsprogress</span>
+                <span className="text-sm text-gray-500">{checkedCount} av {totalItems} varor</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-green-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${(checkedCount / totalItems) * 100}%` }}
+                />
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sampleShoppingList.map((category, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <CategoryIcon category={category.category} />
+                <div
+                  key={index}
+                  className={`rounded-xl border-2 p-5 ${category.color}`}
+                >
+                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">{category.icon}</span>
                     {category.category}
+                    <span className="ml-auto text-sm font-normal text-gray-500">
+                      {category.items.length} varor
+                    </span>
                   </h3>
                   <ul className="space-y-2">
-                    {category.items.map((item, itemIndex) => (
-                      <li key={itemIndex} className="flex items-center gap-2 text-gray-700">
-                        <input type="checkbox" className="rounded border-gray-300" disabled />
-                        <span>{item.name}</span>
-                        <span className="text-gray-400 text-sm ml-auto">
-                          {item.amount} {item.unit}
-                        </span>
-                      </li>
-                    ))}
+                    {category.items.map((item, itemIndex) => {
+                      const isChecked = checkedItems[item.name]
+                      return (
+                        <li
+                          key={itemIndex}
+                          onClick={() => toggleItem(item.name)}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all ${
+                            isChecked
+                              ? 'bg-green-100 opacity-60'
+                              : 'hover:bg-white/50'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                            isChecked
+                              ? 'bg-green-500 border-green-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {isChecked && (
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className={`flex-1 ${isChecked ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                            {item.name}
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            {item.amount} {item.unit}
+                          </span>
+                          {item.isOffer && (
+                            <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs rounded font-medium">
+                              REA
+                            </span>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               ))}
             </div>
+
+            {/* Total Cost */}
+            <div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500">Uppskattad totalkostnad</p>
+                  <p className="text-3xl font-bold text-gray-900">847 kr</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-500">Du sparar ca</p>
+                  <p className="text-2xl font-bold text-green-600">~215 kr</p>
+                  <p className="text-xs text-gray-400">jämfört med ordinarie priser</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* CTA Section */}
+        <section className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
+
+          <div className="relative z-10">
+            <span className="inline-block text-5xl mb-4">🎉</span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Gillar du vad du ser?
+            </h2>
+            <p className="text-green-100 mb-8 max-w-2xl mx-auto text-lg">
+              Skapa ett gratis konto och få personliga matplaner baserade på just <strong>dina</strong> preferenser
+              och veckans bästa erbjudanden i <strong>din</strong> stad.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+              <Link
+                href="/signup"
+                className="px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-lg"
+              >
+                Skapa konto gratis
+              </Link>
+              <Link
+                href="/login"
+                className="px-8 py-4 bg-green-500/30 text-white font-semibold rounded-xl hover:bg-green-500/50 transition-colors border border-white/30"
+              >
+                Redan medlem? Logga in
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-green-200 text-sm">
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Gratis att prova
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                2 matplaner per vecka
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Ingen bindningstid
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Avsluta när du vill
+              </span>
+            </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 md:p-12 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Redo att skapa din egen matplan?
-          </h2>
-          <p className="text-green-100 mb-8 max-w-2xl mx-auto">
-            Skapa ett gratis konto och få personliga matplaner baserade på veckans
-            bästa erbjudanden. Spara både tid och pengar!
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/signup"
-              className="px-8 py-4 bg-white text-green-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              Skapa konto gratis
-            </Link>
-            <Link
-              href="/login"
-              className="px-8 py-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-400 transition-colors"
-            >
-              Logga in
-            </Link>
+        {/* Trust Badges */}
+        <section className="mt-12 text-center">
+          <p className="text-gray-500 text-sm mb-4">Baserat på erbjudanden från</p>
+          <div className="flex justify-center gap-8 opacity-60">
+            <span className="text-2xl font-bold text-red-600">ICA</span>
+            <span className="text-2xl font-bold text-green-700">Coop</span>
+            <span className="text-2xl font-bold text-blue-600">City Gross</span>
           </div>
-          <p className="mt-4 text-green-200 text-sm">
-            Gratis att prova - 2 matplaner per vecka - Ingen bindningstid
-          </p>
         </section>
       </main>
     </div>
   )
 }
 
-function TabButton({ children, active }) {
+// ============================================
+// Recipe Card Component with Expansion
+// ============================================
+function RecipeCard({ recipe, isExpanded, onToggle }) {
   return (
-    <button
-      className={`px-4 py-3 font-medium transition-colors ${
-        active
-          ? 'text-green-600 border-b-2 border-green-600'
-          : 'text-gray-500 hover:text-gray-700'
+    <div
+      className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+        isExpanded ? 'ring-2 ring-green-500' : 'hover:shadow-md'
       }`}
     >
-      {children}
-    </button>
-  )
-}
-
-function RecipeCard({ recipe }) {
-  return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="p-6">
-        <div className="flex flex-col md:flex-row md:items-start gap-4">
+      {/* Header - Always visible */}
+      <div
+        onClick={onToggle}
+        className="p-4 md:p-6 cursor-pointer"
+      >
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
           {/* Day Badge */}
-          <div className="flex-shrink-0">
-            <div className="w-16 h-16 bg-green-100 rounded-xl flex flex-col items-center justify-center">
-              <span className="text-xs text-green-600 font-medium">Dag</span>
-              <span className="text-2xl font-bold text-green-600">{recipe.day}</span>
+          <div className="flex items-center gap-4 md:gap-0">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex flex-col items-center justify-center text-white shadow-md">
+              <span className="text-xs font-medium opacity-80">Dag</span>
+              <span className="text-2xl font-bold">{recipe.day}</span>
+            </div>
+
+            {/* Mobile: Show name next to badge */}
+            <div className="md:hidden flex-1">
+              <span className="text-sm text-gray-500">{recipe.dayName}</span>
+              <h3 className="text-lg font-semibold text-gray-900">{recipe.name}</h3>
+            </div>
+
+            {/* Mobile: Expand indicator */}
+            <div className="md:hidden">
+              <div className={`w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-grow">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+          {/* Desktop: Content */}
+          <div className="hidden md:block flex-grow">
+            <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm text-gray-500">{recipe.dayName}</span>
                 <h3 className="text-xl font-semibold text-gray-900">{recipe.name}</h3>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>{recipe.prepTime} + {recipe.cookTime}</span>
-                <span className="font-semibold text-green-600">{recipe.estimatedCost} kr</span>
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <span>⏱️</span>
+                      {recipe.prepTime} + {recipe.cookTime}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span>👥</span>
+                      {recipe.servings} port
+                    </span>
+                    <span className="px-2 py-1 bg-gray-100 rounded text-xs">
+                      {recipe.difficulty}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-green-600">{recipe.estimatedCost} kr</p>
+                  <p className="text-xs text-gray-400">{recipe.costPerServing} kr/portion</p>
+                </div>
+                <div className={`w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
+            <p className="text-gray-600 mt-1">{recipe.description}</p>
+          </div>
+        </div>
 
-            <p className="text-gray-600 mb-4">{recipe.description}</p>
-
-            {/* Ingredients Preview */}
-            <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.slice(0, 5).map((ing, i) => (
-                <span key={i} className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
-                  {ing.name}
-                </span>
-              ))}
-              {recipe.ingredients.length > 5 && (
-                <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-500">
-                  +{recipe.ingredients.length - 5} till
-                </span>
-              )}
+        {/* Mobile: Description & meta */}
+        <div className="md:hidden mt-3">
+          <p className="text-gray-600 text-sm">{recipe.description}</p>
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-3 text-xs text-gray-500">
+              <span>⏱️ {recipe.prepTime} + {recipe.cookTime}</span>
+              <span>👥 {recipe.servings} port</span>
+              <span className="px-2 py-0.5 bg-gray-100 rounded">{recipe.difficulty}</span>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-green-600">{recipe.estimatedCost} kr</p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="border-t border-gray-100 bg-gray-50 p-4 md:p-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Ingredients */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <span>🥗</span> Ingredienser
+                <span className="text-xs font-normal text-gray-400">({recipe.ingredients.length} st)</span>
+              </h4>
+              <ul className="space-y-2">
+                {recipe.ingredients.map((ing, i) => (
+                  <li key={i} className="flex items-center gap-2 text-gray-700">
+                    <span className={`w-2 h-2 rounded-full ${ing.isFromOffer ? 'bg-green-500' : 'bg-gray-300'}`} />
+                    <span className="flex-1">{ing.name}</span>
+                    <span className="text-gray-400 text-sm">
+                      {ing.amount} {ing.unit}
+                    </span>
+                    {ing.isFromOffer && (
+                      <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+                        Erbjudande
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Instructions */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <span>👨‍🍳</span> Gör så här
+              </h4>
+              <ol className="space-y-3">
+                {recipe.instructions.map((step, i) => (
+                  <li key={i} className="flex gap-3 text-gray-700">
+                    <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-medium">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          {/* Tips */}
+          {recipe.tips && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Tips:</strong> {recipe.tips}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
-}
-
-function CategoryIcon({ category }) {
-  const icons = {
-    'Kött & Fågel': '🥩',
-    'Fisk': '🐟',
-    'Grönsaker': '🥕',
-    'Mejeri': '🧈',
-    'Skafferi': '🥫',
-  }
-  return <span>{icons[category] || '📦'}</span>
 }
