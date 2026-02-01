@@ -126,7 +126,7 @@ export default function LocationSelector({
   // Variant styles
   const buttonStyles = {
     default: 'flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors',
-    header: 'flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors',
+    header: 'flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors',
     hero: 'flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 transition-colors'
   }
 

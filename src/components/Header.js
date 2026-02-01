@@ -3,14 +3,24 @@
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import Link from 'next/link'
+import LocationSelector from '@/components/LocationSelector'
 
 export default function Header() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [selectedCity, setSelectedCity] = useState('Stockholm')
   const dropdownRef = useRef(null)
   const supabase = createClient()
+
+  // Load saved location
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('matvecka-location')
+      if (saved) setSelectedCity(saved)
+    }
+  }, [])
 
   useEffect(() => {
     async function getSession() {
@@ -74,6 +84,15 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
+            {/* Location Selector */}
+            <LocationSelector
+              selectedCity={selectedCity}
+              onCityChange={setSelectedCity}
+              variant="header"
+            />
+
+            <div className="w-px h-5 bg-gray-200" />
+
             <Link
               href="/products"
               className="text-gray-600 hover:text-green-600 transition-colors"
@@ -225,6 +244,16 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 py-4">
             <div className="flex flex-col space-y-1">
+              {/* Mobile Location Selector */}
+              <div className="px-4 py-3 bg-gray-50 rounded-lg mx-2 mb-2">
+                <p className="text-xs font-medium text-gray-500 uppercase mb-2">Din plats</p>
+                <LocationSelector
+                  selectedCity={selectedCity}
+                  onCityChange={setSelectedCity}
+                  variant="header"
+                />
+              </div>
+
               <Link
                 href="/products"
                 onClick={() => setMobileMenuOpen(false)}
