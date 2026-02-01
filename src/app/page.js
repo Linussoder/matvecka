@@ -249,6 +249,13 @@ function GuestHome() {
           </Link>
         </div>
 
+        <Link
+          href="/demo"
+          className="mt-4 inline-block text-green-600 hover:text-green-700 font-medium underline"
+        >
+          Se ett exempel först
+        </Link>
+
         <p className="mt-6 text-sm text-gray-500">
           Gratis för 2 matplaner per vecka. Uppgradera för 99 kr/månad.
         </p>
