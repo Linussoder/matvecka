@@ -1,0 +1,43 @@
+{
+  "name": "Matvecka - Smart matplanering",
+  "short_name": "Matvecka",
+  "description": "Planera veckans måltider och spara pengar med smarta erbjudanden",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "sv",
+  "categories": ["food", "lifestyle", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Skapa matplan",
+      "short_name": "Matplan",
+      "description": "Generera en ny veckomeny",
+      "url": "/meal-planner"
+    },
+    {
+      "name": "Veckans erbjudanden",
+      "short_name": "Erbjudanden",
+      "description": "Se veckans bästa priser",
+      "url": "/products"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

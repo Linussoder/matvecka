@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="108" fill="#16a34a"/>
+  
+  <!-- Shopping Cart Icon -->
+  <g transform="translate(96, 96)">
+    <!-- Cart body -->
+    <path 
+      d="M48 80L64 240H256L288 80H48Z" 
+      fill="white" 
+      fill-opacity="0.9"
+    />
+    
+    <!-- Cart handle -->
+    <path 
+      d="M32 48H64L80 200H240L272 48" 
+      stroke="white" 
+      stroke-width="24" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+      fill="none"
+    />
+    
+    <!-- Wheels -->
+    <circle cx="104" cy="288" r="32" fill="white"/>
+    <circle cx="216" cy="288" r="32" fill="white"/>
+    
+    <!-- Plus sign (representing adding items) -->
+    <path 
+      d="M160 120V180M130 150H190" 
+      stroke="#16a34a" 
+      stroke-width="20" 
+      stroke-linecap="round"
+    />
+  </g>
+  
+  <!-- Decorative elements -->
+  <circle cx="400" cy="120" r="24" fill="white" fill-opacity="0.3"/>
+  <circle cx="440" cy="180" r="16" fill="white" fill-opacity="0.2"/>
+  <circle cx="100" cy="420" r="20" fill="white" fill-opacity="0.2"/>
+</svg>
