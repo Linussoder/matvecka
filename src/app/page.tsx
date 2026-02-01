@@ -23,6 +23,12 @@ export default function Home() {
               Erbjudanden
             </Link>
             <Link
+              href="/meal-planner"
+              className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
+            >
+              Matplanering
+            </Link>
+            <Link
               href="/login"
               className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
             >
