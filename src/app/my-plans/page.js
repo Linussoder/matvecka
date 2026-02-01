@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
-
 export const revalidate = 0 // Always fetch fresh data
 
 export default async function MyMealPlansPage() {
+  // Create client inside function
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
   // Fetch all meal plans
   const { data: mealPlans, error } = await supabase
     .from('meal_plans')
