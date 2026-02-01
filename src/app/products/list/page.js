@@ -4,451 +4,343 @@ import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import Image from 'next/image'
 import Link from 'next/link'
+import ProductsNav from '@/components/ProductsNav'
+import AddToListButton from '@/components/AddToListButton'
 
+// Categories
 const categories = [
-  { id: 'alla', name: 'Alla produkter', icon: '🛒' },
-  { id: 'kött', name: 'Kött & Fågel', icon: '🥩' },
-  { id: 'fisk', name: 'Fisk & Skaldjur', icon: '🐟' },
-  { id: 'mejeri', name: 'Mejeri', icon: '🥛' },
-  { id: 'frukt', name: 'Frukt & Grönt', icon: '🥬' },
-  { id: 'bröd', name: 'Bröd & Bageri', icon: '🍞' },
-  { id: 'fryst', name: 'Fryst', icon: '🧊' },
-  { id: 'dryck', name: 'Drycker', icon: '🥤' },
-  { id: 'skafferi', name: 'Skafferi', icon: '🥫' },
-  { id: 'godis', name: 'Godis & Snacks', icon: '🍫' },
-  { id: 'hygien', name: 'Hygien & Hemmet', icon: '🧴' },
+  { id: 'kött', name: 'Kött & Fågel' },
+  { id: 'fisk', name: 'Fisk & Skaldjur' },
+  { id: 'grönsaker', name: 'Grönsaker' },
+  { id: 'frukt', name: 'Frukt & Bär' },
+  { id: 'mejeri', name: 'Mejeri & Ägg' },
+  { id: 'bröd', name: 'Bröd & Bageri' },
+  { id: 'skafferi', name: 'Skafferi' },
+  { id: 'fryst', name: 'Fryst' },
+  { id: 'dryck', name: 'Dryck' },
+  { id: 'snacks', name: 'Snacks & Godis' },
 ]
 
-const stores = ['Alla', 'ICA', 'Coop', 'City Gross', 'Willys']
+const categoryImages = {
+  'kött': 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80',
+  'fisk': 'https://images.unsplash.com/photo-1510130387422-82bed34b37e9?w=400&q=80',
+  'grönsaker': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80',
+  'frukt': 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&q=80',
+  'mejeri': 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=400&q=80',
+  'bröd': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
+  'skafferi': 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&q=80',
+  'fryst': 'https://images.unsplash.com/photo-1594997756045-f188d785cf65?w=400&q=80',
+  'dryck': 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&q=80',
+  'snacks': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=400&q=80',
+  'default': 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=400&q=80'
+}
 
 export default function ProductsListPage() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('alla')
-  const [selectedStore, setSelectedStore] = useState('Alla')
-  const [sortBy, setSortBy] = useState('name')
-  const [weekInfo, setWeekInfo] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [sortBy, setSortBy] = useState('price-asc')
 
-  // Get current week number
-  const getWeekNumber = () => {
-    const now = new Date()
-    const start = new Date(now.getFullYear(), 0, 1)
-    const diff = now - start
-    const oneWeek = 604800000
-    return Math.ceil((diff / oneWeek) + 1)
-  }
-
-  // Fetch products
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true)
-      const supabase = createClient()
+      try {
+        const supabase = createClient()
 
-      const { data: weeks } = await supabase
-        .from('weeks')
-        .select('*')
-        .eq('is_current', true)
-        .single()
+        const { data: productsData, error: fetchError } = await supabase
+          .from('products')
+          .select('*')
+          .order('price', { ascending: true })
+          .limit(200)
 
-      if (weeks) {
-        setWeekInfo(weeks)
+        if (fetchError) throw fetchError
+
+        setProducts(productsData || [])
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
       }
-
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .order('name')
-
-      if (data) {
-        setProducts(data)
-      }
-
-      setLoading(false)
     }
-
     fetchProducts()
   }, [])
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     let result = [...products]
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
       result = result.filter(p =>
-        p.name?.toLowerCase().includes(query) ||
-        p.store?.toLowerCase().includes(query)
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
-    if (selectedCategory !== 'alla') {
+    if (selectedCategory) {
       result = result.filter(p =>
-        p.category?.toLowerCase() === selectedCategory.toLowerCase()
+        p.category?.toLowerCase() === selectedCategory
       )
     }
 
-    if (selectedStore !== 'Alla') {
-      result = result.filter(p =>
-        p.store?.toLowerCase() === selectedStore.toLowerCase()
-      )
-    }
-
-    if (sortBy === 'name') {
-      result.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'sv'))
-    } else if (sortBy === 'price-low') {
-      result.sort((a, b) => (a.price || 0) - (b.price || 0))
-    } else if (sortBy === 'price-high') {
-      result.sort((a, b) => (b.price || 0) - (a.price || 0))
-    } else if (sortBy === 'discount') {
-      result.sort((a, b) => {
-        const discountA = a.original_price ? ((a.original_price - a.price) / a.original_price) : 0
-        const discountB = b.original_price ? ((b.original_price - b.price) / b.original_price) : 0
-        return discountB - discountA
-      })
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price)
+        break
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price)
+        break
+      case 'name':
+        result.sort((a, b) => a.name.localeCompare(b.name, 'sv'))
+        break
     }
 
     return result
-  }, [products, searchQuery, selectedCategory, selectedStore, sortBy])
+  }, [products, searchQuery, selectedCategory, sortBy])
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString('sv-SE', {
-      day: 'numeric',
-      month: 'short'
-    })
-  }
-
-  const clearFilters = () => {
-    setSearchQuery('')
-    setSelectedCategory('alla')
-    setSelectedStore('Alla')
-    setSortBy('name')
-  }
-
-  const hasActiveFilters = searchQuery || selectedCategory !== 'alla' || selectedStore !== 'Alla'
+  const hasActiveFilters = searchQuery || selectedCategory
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      {/* Hero Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-            <Link href="/" className="hover:text-gray-700">Hem</Link>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            <Link href="/products" className="hover:text-gray-700">Erbjudanden</Link>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            <span className="text-gray-900">Produkter</span>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              {/* Week badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                Vecka {getWeekNumber()} - {filteredProducts.length} erbjudanden
-              </div>
-
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                Alla erbjudanden
-              </h1>
-              <p className="text-gray-600 text-lg">
-                {weekInfo ? `${formatDate(weekInfo.start_date)} – ${formatDate(weekInfo.end_date)}` : 'Sök och filtrera bland veckans deals'}
-              </p>
-            </div>
-
-            {/* Store logos */}
-            <div className="flex items-center gap-6">
-              <span className="text-sm text-gray-400">Från</span>
-              <div className="flex items-center gap-4 opacity-70">
-                <span className="text-lg font-bold text-red-600">ICA</span>
-                <span className="text-lg font-bold text-green-700">Coop</span>
-                <span className="text-lg font-bold text-blue-600">City Gross</span>
-                <span className="text-lg font-bold text-orange-500">Willys</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-linear-to-b from-white to-gray-50">
+      {/* Shared Navigation */}
+      <ProductsNav />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
+
           {/* Sidebar */}
-          <div className="lg:w-72 shrink-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sticky top-20">
+          <aside className="lg:w-56 shrink-0">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:sticky lg:top-32">
               {/* Search */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Sök produkt</label>
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Sök..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-0 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:bg-white transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Store Filter */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Butik</label>
-                <div className="flex flex-wrap gap-2">
-                  {stores.map((store) => (
-                    <button
-                      key={store}
-                      onClick={() => setSelectedStore(store)}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                        selectedStore === store
-                          ? 'bg-green-600 text-white shadow-md shadow-green-600/25'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      {store}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Category Filter */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Kategori</label>
-                <div className="space-y-1 max-h-75 overflow-y-auto">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                        selectedCategory === cat.id
-                          ? 'bg-gray-900 text-white font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <span className="text-lg">{cat.icon}</span>
-                      <span>{cat.name}</span>
-                    </button>
-                  ))}
-                </div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Sök</label>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Sök produkt..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
               </div>
 
               {/* Sort */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Sortera</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Sortera</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-gray-50 border-0 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="name">Namn (A-Ö)</option>
-                  <option value="price-low">Pris (lägst först)</option>
-                  <option value="price-high">Pris (högst först)</option>
-                  <option value="discount">Rabatt</option>
+                  <option value="price-asc">Pris: Lägst först</option>
+                  <option value="price-desc">Pris: Högst först</option>
+                  <option value="name">Namn A–Ö</option>
                 </select>
               </div>
 
-              {/* Clear Filters */}
+              {/* Categories */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Kategorier</label>
+                <nav className="space-y-1">
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                      !selectedCategory
+                        ? 'bg-green-600 text-white font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Alla kategorier
+                  </button>
+                  {categories.map((cat) => {
+                    const count = products.filter(p =>
+                      p.category?.toLowerCase() === cat.id
+                    ).length
+                    if (count === 0) return null
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex justify-between ${
+                          selectedCategory === cat.id
+                            ? 'bg-green-600 text-white font-medium'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        <span className={selectedCategory === cat.id ? 'text-green-200' : 'text-gray-400'}>
+                          {count}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              {/* Clear filters */}
               {hasActiveFilters && (
                 <button
-                  onClick={clearFilters}
-                  className="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors font-medium"
+                  onClick={() => { setSelectedCategory(null); setSearchQuery(''); }}
+                  className="w-full mt-4 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Rensa alla filter
+                  Rensa filter
                 </button>
               )}
             </div>
-          </div>
+          </aside>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* Active Filters */}
-            {hasActiveFilters && (
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="text-sm text-gray-500">Aktiva filter:</span>
-                {searchQuery && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                    "{searchQuery}"
-                    <button onClick={() => setSearchQuery('')} className="hover:text-green-900 ml-1">×</button>
-                  </span>
-                )}
-                {selectedCategory !== 'alla' && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                    {categories.find(c => c.id === selectedCategory)?.icon} {categories.find(c => c.id === selectedCategory)?.name}
-                    <button onClick={() => setSelectedCategory('alla')} className="hover:text-green-900 ml-1">×</button>
-                  </span>
-                )}
-                {selectedStore !== 'Alla' && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                    {selectedStore}
-                    <button onClick={() => setSelectedStore('Alla')} className="hover:text-green-900 ml-1">×</button>
-                  </span>
-                )}
-              </div>
-            )}
+          {/* Main */}
+          <main className="flex-1 min-w-0">
+            {/* Results info */}
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-600">
+                <span className="font-semibold text-gray-900">{filteredProducts.length}</span> produkter
+                {selectedCategory && ` i ${categories.find(c => c.id === selectedCategory)?.name}`}
+              </p>
 
-            {/* Products Grid */}
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              {hasActiveFilters && (
+                <div className="flex gap-2">
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                      "{searchQuery}"
+                      <button onClick={() => setSearchQuery('')} className="hover:text-green-900">×</button>
+                    </span>
+                  )}
+                  {selectedCategory && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                      {categories.find(c => c.id === selectedCategory)?.name}
+                      <button onClick={() => setSelectedCategory(null)} className="hover:text-green-900">×</button>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Loading */}
+            {loading && (
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {[...Array(12)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-4 animate-pulse shadow-sm">
-                    <div className="aspect-square bg-gray-200 rounded-xl mb-3" />
-                    <div className="h-4 bg-gray-200 rounded mb-2" />
-                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  <div key={i} className="bg-white rounded-xl p-4 animate-pulse shadow-sm">
+                    <div className="aspect-square bg-gray-100 rounded-lg mb-3" />
+                    <div className="h-4 bg-gray-100 rounded mb-2" />
+                    <div className="h-4 bg-gray-100 rounded w-1/2" />
                   </div>
                 ))}
               </div>
-            ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+                <p className="text-gray-500">Ett fel uppstod: {error}</p>
+              </div>
+            )}
+
+            {/* Empty */}
+            {!loading && !error && filteredProducts.length === 0 && (
+              <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+                <p className="text-xl font-semibold text-gray-900 mb-2">Inga produkter hittades</p>
+                <p className="text-gray-500 mb-4">Prova att ändra dina filter</p>
+                <button
+                  onClick={() => { setSelectedCategory(null); setSearchQuery(''); }}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                >
+                  Visa alla produkter
+                </button>
+              </div>
+            )}
+
+            {/* Products */}
+            {!loading && !error && filteredProducts.length > 0 && (
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-            ) : (
-              <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                  🔍
+            )}
+
+            {/* CTA Section */}
+            {!loading && filteredProducts.length > 0 && (
+              <div className="mt-16 bg-linear-to-r from-green-600 to-green-700 rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
+
+                <div className="relative z-10">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                    Vill du spara ännu mer?
+                  </h2>
+                  <p className="text-green-100 mb-6 max-w-xl mx-auto">
+                    Skapa en matplan baserad på veckans bästa erbjudanden
+                  </p>
+                  <Link
+                    href="/meal-planner"
+                    className="inline-block px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
+                  >
+                    Skapa matplan gratis →
+                  </Link>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Inga produkter hittades</h3>
-                <p className="text-gray-500 mb-4">Prova att ändra dina filter</p>
-                <button
-                  onClick={clearFilters}
-                  className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
-                >
-                  Rensa filter
-                </button>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Info Section */}
-        <div className="mt-16 grid md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">
-              🔄
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Uppdateras varje vecka</h3>
-            <p className="text-gray-600 text-sm">Nya erbjudanden laddas upp varje måndag</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">
-              🏷️
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Jämför priser</h3>
-            <p className="text-gray-600 text-sm">Se erbjudanden från alla butiker på ett ställe</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">
-              📱
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Fungerar överallt</h3>
-            <p className="text-gray-600 text-sm">Använd på datorn eller mobilen i butiken</p>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="mt-16 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
-
-          <div className="relative z-10">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              Vill du spara ännu mer?
-            </h2>
-            <p className="text-green-100 mb-6 max-w-xl mx-auto">
-              Låt oss skapa en smart matplan baserad på veckans bästa erbjudanden
-            </p>
-            <Link
-              href="/meal-planner"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
-            >
-              Skapa matplan gratis
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
+          </main>
         </div>
       </div>
     </div>
   )
 }
 
-// Product Card Component
 function ProductCard({ product }) {
-  const discount = product.original_price
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
-    : null
-
-  const storeColors = {
-    'ica': 'bg-red-500',
-    'coop': 'bg-green-600',
-    'city gross': 'bg-blue-600',
-    'willys': 'bg-orange-500',
-  }
-
-  const storeColor = storeColors[product.store?.toLowerCase()] || 'bg-gray-500'
+  const imageUrl = product.image_url || categoryImages[product.category?.toLowerCase()] || categoryImages.default
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden border border-gray-100 group">
-      {/* Image */}
-      <div className="aspect-square bg-gray-50 relative overflow-hidden">
-        {product.image_url ? (
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-300"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-        )}
+    <div className="group flex flex-col h-full">
+      <div className="relative aspect-square bg-gray-50 rounded-md overflow-hidden">
+        <Image
+          src={imageUrl}
+          alt={product.name}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          unoptimized
+        />
 
         {/* Store badge */}
-        <div className={`absolute top-2 left-2 ${storeColor} text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-lg`}>
-          {product.store}
+        <div className="absolute top-2 left-2">
+          <span className="px-1.5 py-0.5 bg-white/90 text-xs font-medium text-gray-700 rounded">
+            {product.store || 'ICA'}
+          </span>
+        </div>
+
+        {/* Add to list button - shows on hover */}
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <AddToListButton product={product} variant="icon" />
         </div>
 
         {/* Discount badge */}
-        {discount && discount > 0 && (
-          <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-            -{discount}%
+        {product.original_price && product.original_price > product.price && (
+          <div className="absolute bottom-2 left-2">
+            <span className="px-1.5 py-0.5 bg-red-600 text-xs font-medium text-white rounded">
+              -{Math.round((1 - product.price / product.original_price) * 100)}%
+            </span>
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-2 min-h-[2.5rem]">
+      <div className="flex flex-col flex-1 pt-2">
+        <p className="text-xs text-gray-400 uppercase tracking-wide">
+          {product.category || 'Övrigt'}
+        </p>
+        <h3 className="text-sm text-gray-900 font-medium leading-tight line-clamp-2 h-10 mt-0.5">
           {product.name}
         </h3>
-        <div className="flex items-baseline gap-2">
-          <span className="text-xl font-bold text-gray-900">
-            {product.price?.toFixed(0)}:-
-          </span>
-          {product.original_price && product.original_price > product.price && (
-            <span className="text-sm text-gray-400 line-through">
-              {product.original_price?.toFixed(0)}:-
+        <div className="flex items-center justify-between mt-auto">
+          <div className="flex items-baseline gap-1">
+            <span className="text-lg font-semibold text-gray-900">
+              {product.price} kr
             </span>
-          )}
+            <span className="text-sm text-gray-400">
+              /{product.unit || 'st'}
+            </span>
+          </div>
+          <AddToListButton product={product} variant="small" />
         </div>
-        {product.unit && (
-          <p className="text-xs text-gray-500 mt-1">{product.unit}</p>
-        )}
       </div>
     </div>
   )

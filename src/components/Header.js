@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import Link from 'next/link'
 import LocationSelector from '@/components/LocationSelector'
+import { useShoppingList } from '@/contexts/ShoppingListContext'
 
 export default function Header() {
   const [user, setUser] = useState(null)
@@ -13,6 +14,7 @@ export default function Header() {
   const [selectedCity, setSelectedCity] = useState('Stockholm')
   const dropdownRef = useRef(null)
   const supabase = createClient()
+  const { itemCount, openDrawer } = useShoppingList()
 
   // Load saved location
   useEffect(() => {
@@ -90,6 +92,21 @@ export default function Header() {
               onCityChange={setSelectedCity}
               variant="header"
             />
+
+            {/* Shopping Cart Button */}
+            <button
+              onClick={openDrawer}
+              className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </button>
 
             <div className="w-px h-5 bg-gray-200" />
 
@@ -223,11 +240,25 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 hover:text-green-600"
-          >
+          {/* Mobile Cart & Menu Buttons */}
+          <div className="md:hidden flex items-center gap-1">
+            <button
+              onClick={openDrawer}
+              className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-gray-600 hover:text-green-600"
+            >
             {mobileMenuOpen ? (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -237,7 +268,8 @@ export default function Header() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
-          </button>
+            </button>
+          </div>
         </nav>
 
         {/* Mobile Menu */}
