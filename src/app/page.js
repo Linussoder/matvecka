@@ -223,127 +223,274 @@ function LoggedInHome({ user, stats }) {
 function GuestHome() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <main className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-          Spara tid och pengar på<br />veckohandlingen
-        </h1>
+      <main className="container mx-auto px-4 py-16 md:py-24">
+        {/* Hero Section */}
+        <div className="text-center max-w-4xl mx-auto">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            Nytt: Nu med stöd för ICA, Coop & City Gross
+          </div>
 
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Matvecka skapar smarta matplaner baserade på veckans bästa erbjudanden
-          från ICA, Coop och City Gross.
-        </p>
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            Spara tid och pengar på{' '}
+            <span className="text-green-600">veckohandlingen</span>
+          </h1>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link
-            href="/signup"
-            className="px-8 py-4 bg-green-600 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-          >
-            Kom igång gratis →
-          </Link>
+          <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto">
+            Matvecka skapar smarta matplaner baserade på veckans bästa erbjudanden.
+            Du får recept och inköpslista – vi gör jobbet åt dig.
+          </p>
 
-          <Link
-            href="/products"
-            className="px-8 py-4 bg-white text-green-600 text-lg font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow border border-gray-200"
-          >
-            Se erbjudanden
-          </Link>
+          {/* Two Equal CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+            <Link
+              href="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-green-600 text-white text-lg font-semibold rounded-xl hover:bg-green-700 transition-all hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              Kom igång gratis →
+            </Link>
+
+            <Link
+              href="/demo"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-gray-800 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-all hover:scale-105 shadow-lg hover:shadow-xl border-2 border-gray-200 flex items-center justify-center gap-2 group"
+            >
+              <span className="text-2xl">👀</span>
+              Se ett exempel
+              <svg
+                className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+
+          <p className="text-sm text-gray-500">
+            ✓ Gratis för 2 matplaner per vecka &nbsp;•&nbsp; ✓ Ingen bindningstid
+          </p>
         </div>
 
-        <p className="mt-6 text-sm text-gray-500">
-          Gratis för 2 matplaner per vecka. Uppgradera för 99 kr/månad.
-        </p>
+        {/* Demo Preview Card - Eye Catching! */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <Link href="/demo" className="block group">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all hover:-translate-y-1">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-green-600 to-green-500 text-white p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📋</span>
+                  <div>
+                    <p className="font-semibold">Exempelplan - Vecka 5</p>
+                    <p className="text-green-100 text-sm">7 dagar • 4 portioner • 847 kr totalt</p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm">
+                  <span>Klicka för att utforska</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
 
-        {/* Demo Preview Section */}
-        <div className="mt-8">
-          <Link
-            href="/demo"
-            className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium group"
-          >
-            <span className="text-xl">👀</span>
-            Se hur en matplan ser ut
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+              {/* Preview Content */}
+              <div className="p-6">
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {['Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön'].map((day, i) => (
+                    <div key={day} className="text-center">
+                      <p className="text-xs text-gray-400 mb-1">{day}</p>
+                      <div className="aspect-square bg-gradient-to-br from-green-50 to-green-100 rounded-lg flex items-center justify-center text-2xl border border-green-200">
+                        {['🍝', '🐟', '🍝', '🍛', '🍟', '🌮', '🍗'][i]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Sample recipes preview */}
+                <div className="space-y-2">
+                  {[
+                    { day: 'Måndag', name: 'Krämig kycklingpasta', price: '112 kr' },
+                    { day: 'Tisdag', name: 'Ugnsbakad lax med potatismos', price: '145 kr' },
+                    { day: 'Onsdag', name: 'Klassisk köttfärssås', price: '89 kr' },
+                  ].map((recipe, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-sm">
+                          {i + 1}
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400">{recipe.day}</p>
+                          <p className="font-medium text-gray-800">{recipe.name}</p>
+                        </div>
+                      </div>
+                      <span className="text-green-600 font-semibold">{recipe.price}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* See more hint */}
+                <div className="mt-4 text-center">
+                  <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium group-hover:gap-2 transition-all">
+                    Se alla 7 recept + inköpslista
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
           </Link>
         </div>
 
         {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto">
           <FeatureCard
             icon="📊"
             title="Jämför priser"
-            description="Se direkt var veckans bästa erbjudanden finns"
+            description="Vi kollar ICA, Coop och City Gross åt dig och hittar veckans bästa deals"
           />
           <FeatureCard
             icon="👨‍🍳"
             title="Smarta recept"
-            description="Skräddarsydda recept från veckans billigaste varor"
+            description="Skräddarsydda recept som passar din budget och dina preferenser"
           />
           <FeatureCard
             icon="📝"
-            title="Inköpslista"
-            description="Få en färdig lista att ta med till butiken"
+            title="Färdig inköpslista"
+            description="Allt du behöver, sorterat efter kategori. Skriv ut eller använd i mobilen"
           />
         </div>
 
         {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto">
-          <StatCard number="892 kr" label="Genomsnittlig månadsbesparing" />
-          <StatCard number="45 min" label="Sparad tid per vecka" />
-          <StatCard number="4.8★" label="Betyg från användare" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 max-w-4xl mx-auto">
+          <StatCard number="892 kr" label="Snittbesparing/månad" />
+          <StatCard number="45 min" label="Sparad tid/vecka" />
+          <StatCard number="4.8★" label="Användaromdöme" />
+          <StatCard number="10k+" label="Matplaner skapade" />
         </div>
 
         {/* How it works */}
         <div className="mt-24 max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12">Så fungerar det</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
+            Så enkelt fungerar det
+          </h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Från val till färdig inköpslista på under en minut
+          </p>
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">1</span>
+              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                ⚙️
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Välj dina preferenser</h3>
-              <p className="text-gray-600 text-sm">Antal portioner, budget och eventuella kostpreferenser</p>
+              <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto -mt-8 mb-4 font-bold shadow-lg">
+                1
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2 text-lg">Välj preferenser</h3>
+              <p className="text-gray-600">Antal portioner, budget och kostpreferenser</p>
             </div>
+
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">2</span>
+              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                ✨
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Matvecka skapar din plan</h3>
-              <p className="text-gray-600 text-sm">7 dagar med recept baserade på veckans bästa priser</p>
+              <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto -mt-8 mb-4 font-bold shadow-lg">
+                2
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2 text-lg">Få din matplan</h3>
+              <p className="text-gray-600">7 recept baserade på veckans bästa priser</p>
             </div>
+
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">3</span>
+              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                🛒
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Handla smart</h3>
-              <p className="text-gray-600 text-sm">Skriv ut inköpslistan och spara pengar i butiken</p>
+              <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto -mt-8 mb-4 font-bold shadow-lg">
+                3
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2 text-lg">Handla smart</h3>
+              <p className="text-gray-600">Använd inköpslistan och spara pengar</p>
             </div>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-24 bg-green-600 rounded-2xl p-12 max-w-4xl mx-auto text-white">
-          <h2 className="text-3xl font-bold mb-4">Redo att börja spara?</h2>
-          <p className="text-green-100 mb-8 max-w-xl mx-auto">
-            Skapa ett gratis konto och få din första personliga matplan på under en minut.
-          </p>
-          <Link
-            href="/signup"
-            className="inline-block px-8 py-4 bg-white text-green-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Skapa konto gratis →
-          </Link>
+        {/* Testimonial */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-shrink-0">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl">
+                  👩
+                </div>
+              </div>
+              <div>
+                <p className="text-xl text-gray-700 italic mb-4">
+                  "Innan Matvecka spenderade jag timmar varje vecka på att planera maten och
+                  leta erbjudanden. Nu tar det 2 minuter och jag sparar ungefär 800 kr i månaden!"
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-900">Anna L.</span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-500">Stockholm</span>
+                  <span className="text-yellow-500 ml-2">★★★★★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="mt-24 bg-gradient-to-r from-green-600 to-green-700 rounded-3xl p-8 md:p-16 max-w-5xl mx-auto text-white text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
+
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              Redo att börja spara?
+            </h2>
+            <p className="text-green-100 mb-8 max-w-xl mx-auto text-lg">
+              Gå med tusentals svenskar som redan sparar tid och pengar varje vecka.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/signup"
+                className="px-10 py-5 bg-white text-green-600 text-lg font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
+              >
+                Skapa konto gratis →
+              </Link>
+              <Link
+                href="/demo"
+                className="px-10 py-5 bg-green-500/30 text-white text-lg font-semibold rounded-xl hover:bg-green-500/50 transition-all border border-white/30 flex items-center justify-center gap-2"
+              >
+                <span>👀</span>
+                Se demo först
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
 
-      <footer className="border-t border-gray-200 mt-20">
-        <div className="container mx-auto px-4 py-8 text-center text-gray-600">
-          <p>© 2026 Matvecka. Alla rättigheter förbehållna.</p>
+      {/* Footer */}
+      <footer className="border-t border-gray-200 mt-24">
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🛒</span>
+              <span className="font-bold text-gray-900">Matvecka</span>
+            </div>
+            <div className="flex gap-6 text-sm text-gray-500">
+              <Link href="/demo" className="hover:text-gray-700">Demo</Link>
+              <Link href="/products" className="hover:text-gray-700">Erbjudanden</Link>
+              <Link href="/terms" className="hover:text-gray-700">Villkor</Link>
+              <Link href="/privacy" className="hover:text-gray-700">Integritet</Link>
+            </div>
+            <p className="text-gray-400 text-sm">© 2026 Matvecka</p>
+          </div>
         </div>
       </footer>
     </div>
