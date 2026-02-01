@@ -44,3 +44,19 @@ input:disabled, select:disabled, textarea:disabled {
   color: #6B7280 !important; /* text-gray-500 */
   background-color: #F3F4F6; /* bg-gray-100 */
 }
+
+/* Animation for expanding content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
