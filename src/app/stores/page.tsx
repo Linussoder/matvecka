@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 interface Store {
   id: string
@@ -8,6 +8,12 @@ interface Store {
 }
 
 export default async function StoresPage() {
+  // Create client inside function
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
   // Fetch stores from Supabase
   const { data: stores, error } = await supabase
     .from('stores')

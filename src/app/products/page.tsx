@@ -1,16 +1,22 @@
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 
 export const revalidate = 3600
 
 export default async function ProductsPage() {
+  // Create client inside function
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
   let latestWeek: any = null
   let products: any[] | null = null
   let error: string | null = null
 
   try {
     // Get most recent week
-    const { data: weekData, error: weekError } = await supabaseAdmin
+    const { data: weekData, error: weekError } = await supabase
       .from('weeks')
       .select('id, start_date, end_date, store_id, stores(name, chain, city)')
       .order('start_date', { ascending: false })
@@ -26,7 +32,7 @@ export default async function ProductsPage() {
 
     // Get products from that week
     if (latestWeek) {
-      const { data: productData, error: productError } = await supabaseAdmin
+      const { data: productData, error: productError } = await supabase
         .from('products')
         .select('*')
         .eq('week_id', latestWeek.id)
