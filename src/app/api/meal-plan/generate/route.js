@@ -2,32 +2,44 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
-
-// Use service role key for server-side operations (bypasses RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+// Don't create clients at top level - do it inside the function
 
 export async function POST(request) {
   try {
+    // Create clients INSIDE the function
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+
     const preferences = await request.json()
 
-    console.log('Received preferences:', preferences)
+    console.log('📝 Received preferences:', preferences)
 
     // Fetch products from database
-    const { data: products, error: productsError } = await supabase
+    const { data: weekData } = await supabase
+      .from('weeks')
+      .select('id')
+      .order('start_date', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (!weekData) {
+      return NextResponse.json(
+        { error: 'Inga produkter hittades. Kör scraper först.' },
+        { status: 400 }
+      )
+    }
+
+    const { data: products } = await supabase
       .from('products')
       .select('*')
+      .eq('week_id', weekData.id)
       .limit(30)
-
-    if (productsError) {
-      console.error('Products fetch error:', productsError)
-      throw productsError
-    }
 
     if (!products || products.length === 0) {
       return NextResponse.json(
@@ -36,17 +48,18 @@ export async function POST(request) {
       )
     }
 
-    console.log(`Found ${products.length} products`)
+    console.log(`📦 Found ${products.length} products`)
 
     // Generate 7 recipes
     const recipes = []
     const usedMainIngredients = []
 
     for (let day = 1; day <= 7; day++) {
-      console.log(`Generating recipe for day ${day}...`)
+      console.log(`🍳 Generating recipe for day ${day}...`)
 
       try {
         const recipe = await generateRecipe(
+          anthropic,
           products,
           preferences,
           usedMainIngredients,
@@ -55,17 +68,15 @@ export async function POST(request) {
 
         recipes.push(recipe)
 
-        // Track main ingredient to avoid repetition
         if (recipe.ingredients && recipe.ingredients.length > 0) {
           usedMainIngredients.push(recipe.ingredients[0].name.toLowerCase())
         }
 
-        console.log(`Day ${day}: ${recipe.name}`)
+        console.log(`✅ Day ${day}: ${recipe.name}`)
 
       } catch (recipeError) {
-        console.error(`Failed to generate recipe for day ${day}:`, recipeError.message)
+        console.error(`❌ Failed to generate recipe for day ${day}:`, recipeError.message)
 
-        // Add a fallback recipe
         recipes.push({
           name: `Dag ${day} - Recept kunde inte genereras`,
           description: 'Försök igen senare',
@@ -80,13 +91,11 @@ export async function POST(request) {
         })
       }
 
-      // Small delay between requests to avoid rate limiting
       if (day < 7) {
         await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
 
-    // Calculate totals
     const totalCost = recipes.reduce((sum, r) => {
       const cost = parseFloat(r.estimatedCost) || 0
       return sum + cost
@@ -94,10 +103,10 @@ export async function POST(request) {
 
     const avgCostPerServing = (totalCost / 7 / (preferences.servings || 4)).toFixed(2)
 
-    console.log(`Generated ${recipes.length} recipes, total cost: ${totalCost} kr`)
+    console.log(`✅ Generated ${recipes.length} recipes, total cost: ${totalCost} kr`)
 
     // Save meal plan to database
-    const mealPlanId = await saveMealPlan(recipes, preferences, totalCost)
+    const mealPlanId = await saveMealPlan(supabase, recipes, preferences, totalCost)
 
     return NextResponse.json({
       recipes,
@@ -108,7 +117,7 @@ export async function POST(request) {
     })
 
   } catch (error) {
-    console.error('Meal plan generation error:', error)
+    console.error('❌ Meal plan generation error:', error)
     return NextResponse.json(
       { error: error.message || 'Ett fel uppstod vid generering av matplan' },
       { status: 500 }
@@ -116,7 +125,7 @@ export async function POST(request) {
   }
 }
 
-async function generateRecipe(products, preferences, usedIngredients, dayNumber) {
+async function generateRecipe(anthropic, products, preferences, usedIngredients, dayNumber) {
   const productList = products
     .map(p => `- ${p.name}: ${p.price} kr/${p.unit}`)
     .join('\n')
@@ -181,16 +190,13 @@ Svara med exakt detta JSON-format:
 
   const responseText = message.content[0].text.trim()
 
-  // Try to extract JSON from the response
   let jsonStr = responseText
 
-  // If response contains markdown code blocks, extract the JSON
   const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (jsonMatch) {
     jsonStr = jsonMatch[1].trim()
   }
 
-  // If response starts with text before JSON, try to find the JSON object
   const jsonStartIndex = jsonStr.indexOf('{')
   const jsonEndIndex = jsonStr.lastIndexOf('}')
 
@@ -207,7 +213,7 @@ Svara med exakt detta JSON-format:
   }
 }
 
-async function saveMealPlan(recipes, preferences, totalCost) {
+async function saveMealPlan(supabase, recipes, preferences, totalCost) {
   try {
     // 1. Create meal plan
     const { data: mealPlan, error: planError } = await supabase
