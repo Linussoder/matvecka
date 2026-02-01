@@ -249,16 +249,23 @@ function GuestHome() {
           </Link>
         </div>
 
-        <Link
-          href="/demo"
-          className="mt-4 inline-block text-green-600 hover:text-green-700 font-medium underline"
-        >
-          Se ett exempel först
-        </Link>
-
         <p className="mt-6 text-sm text-gray-500">
           Gratis för 2 matplaner per vecka. Uppgradera för 99 kr/månad.
         </p>
+
+        {/* Demo Preview Section */}
+        <div className="mt-12 text-center">
+          <p className="text-gray-600 mb-2">Nyfiken på hur det fungerar?</p>
+          <Link
+            href="/demo"
+            className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+          >
+            Se en exempelplan
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
 
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
