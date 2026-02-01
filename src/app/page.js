@@ -237,7 +237,12 @@ function GuestHome() {
 
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
             Spara tid och pengar på{' '}
-            <span className="text-green-600">veckohandlingen</span>
+            <span className="relative text-green-600">
+              veckohandlingen
+              <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 8" preserveAspectRatio="none">
+                <path d="M0,5 Q50,0 100,5 T200,5" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+            </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto">
@@ -274,6 +279,16 @@ function GuestHome() {
           <p className="text-sm text-gray-500">
             ✓ Gratis för 2 matplaner per vecka &nbsp;•&nbsp; ✓ Ingen bindningstid
           </p>
+        </div>
+
+        {/* Social Proof Bar */}
+        <div className="mt-12 text-center">
+          <p className="text-gray-400 text-sm mb-4">Hämtar priser från</p>
+          <div className="flex justify-center items-center gap-8 opacity-60">
+            <span className="text-2xl font-bold text-red-600">ICA</span>
+            <span className="text-2xl font-bold text-green-700">Coop</span>
+            <span className="text-2xl font-bold text-orange-500">City Gross</span>
+          </div>
         </div>
 
         {/* Demo Preview Card - Eye Catching! */}
@@ -313,9 +328,9 @@ function GuestHome() {
                 {/* Sample recipes preview */}
                 <div className="space-y-2">
                   {[
-                    { day: 'Måndag', name: 'Krämig kycklingpasta', price: '112 kr' },
-                    { day: 'Tisdag', name: 'Ugnsbakad lax med potatismos', price: '145 kr' },
-                    { day: 'Onsdag', name: 'Klassisk köttfärssås', price: '89 kr' },
+                    { day: 'Måndag', name: 'Krämig kycklingpasta', time: '30 min', price: '112 kr' },
+                    { day: 'Tisdag', name: 'Ugnsbakad lax med potatismos', time: '45 min', price: '145 kr' },
+                    { day: 'Onsdag', name: 'Klassisk köttfärssås', time: '40 min', price: '89 kr' },
                   ].map((recipe, i) => (
                     <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                       <div className="flex items-center gap-3">
@@ -325,6 +340,7 @@ function GuestHome() {
                         <div>
                           <p className="text-xs text-gray-400">{recipe.day}</p>
                           <p className="font-medium text-gray-800">{recipe.name}</p>
+                          <p className="text-xs text-gray-400">{recipe.time}</p>
                         </div>
                       </div>
                       <span className="text-green-600 font-semibold">{recipe.price}</span>
@@ -418,28 +434,76 @@ function GuestHome() {
           </div>
         </div>
 
-        {/* Testimonial */}
-        <div className="mt-24 max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-shrink-0">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl">
+        {/* Testimonials - Two cards */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Vad våra användare säger
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
                   👩
                 </div>
-              </div>
-              <div>
-                <p className="text-xl text-gray-700 italic mb-4">
-                  "Innan Matvecka spenderade jag timmar varje vecka på att planera maten och
-                  leta erbjudanden. Nu tar det 2 minuter och jag sparar ungefär 800 kr i månaden!"
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-900">Anna L.</span>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-500">Stockholm</span>
-                  <span className="text-yellow-500 ml-2">★★★★★</span>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900">Anna L.</span>
+                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-500 text-sm">Stockholm</span>
+                  </div>
+                  <span className="text-yellow-500">★★★★★</span>
                 </div>
               </div>
+              <p className="text-gray-700 italic">
+                "Innan Matvecka spenderade jag timmar varje vecka på att planera maten och
+                leta erbjudanden. Nu tar det 2 minuter och jag sparar ungefär 800 kr i månaden!"
+              </p>
             </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+                  👨
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900">Erik M.</span>
+                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-500 text-sm">Göteborg</span>
+                  </div>
+                  <span className="text-yellow-500">★★★★★</span>
+                </div>
+              </div>
+              <p className="text-gray-700 italic">
+                "Som student är det perfekt! Jag får variation i maten utan att behöva tänka,
+                och inköpslistan gör att jag inte köper onödiga saker längre."
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Vanliga frågor
+          </h2>
+          <div className="space-y-4">
+            <FAQItem
+              question="Är Matvecka gratis?"
+              answer="Ja! Du kan skapa upp till 2 matplaner per vecka helt gratis. Vill du ha fler eller extra funktioner finns premium-versionen."
+            />
+            <FAQItem
+              question="Vilka butiker stöds?"
+              answer="Just nu hämtar vi erbjudanden från ICA, Coop och City Gross. Fler butiker kommer snart!"
+            />
+            <FAQItem
+              question="Kan jag anpassa recepten?"
+              answer="Absolut! Du kan ange allergier, kostpreferenser (vegetarisk, vegan etc.) och vilka råvaror du vill undvika."
+            />
+            <FAQItem
+              question="Hur fungerar inköpslistan?"
+              answer="När din matplan är klar får du en automatisk inköpslista med allt du behöver, sorterad efter kategori. Du kan bocka av varor direkt i appen."
+            />
           </div>
         </div>
 
@@ -493,6 +557,35 @@ function GuestHome() {
           </div>
         </div>
       </footer>
+    </div>
+  )
+}
+
+// FAQ Accordion Item Component
+function FAQItem({ question, answer }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+      >
+        <span className="font-semibold text-gray-900">{question}</span>
+        <svg
+          className={`w-5 h-5 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-4 text-gray-600 animate-fadeIn">
+          {answer}
+        </div>
+      )}
     </div>
   )
 }
