@@ -34,21 +34,36 @@ export default async function ProductsPage() {
       latestWeek = weekData
     }
 
-    // Get products from that week
+    // Get products - filter by week if available, otherwise show all
+    let productData: any[] | null = null
+    let productError: any = null
+
     if (latestWeek) {
-      const { data: productData, error: productError } = await supabase
+      // Filter by week
+      const result = await supabase
         .from('products')
         .select('*')
         .eq('week_id', latestWeek.id)
         .order('price', { ascending: true })
         .limit(50)
+      productData = result.data
+      productError = result.error
+    } else {
+      // No week - show all products
+      const result = await supabase
+        .from('products')
+        .select('*')
+        .order('price', { ascending: true })
+        .limit(50)
+      productData = result.data
+      productError = result.error
+    }
 
-      if (productError) {
-        console.error('Product fetch error:', productError)
-        error = 'Kunde inte hämta produkter: ' + productError.message
-      } else {
-        products = productData
-      }
+    if (productError) {
+      console.error('Product fetch error:', productError)
+      error = 'Kunde inte hämta produkter: ' + productError.message
+    } else {
+      products = productData
     }
 
   } catch (err: any) {
