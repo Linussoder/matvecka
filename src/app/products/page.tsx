@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 
-export const revalidate = 3600
+// Force dynamic rendering - don't prerender at build time
+export const dynamic = 'force-dynamic'
 
 export default async function ProductsPage() {
   // Create client inside function
