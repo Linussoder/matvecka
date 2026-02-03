@@ -535,7 +535,9 @@ function NutritionPreview({ nutrition, onLockedClick }) {
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
           <span className="w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-            <span className="text-sm">🔥</span>
+            <svg className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+            </svg>
           </span>
           Näringsvärde per portion
           {!hasRealData && (
@@ -556,8 +558,13 @@ function NutritionPreview({ nutrition, onLockedClick }) {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Calories */}
         <div className="flex items-center gap-2">
-          <span className="text-lg">🔥</span>
+          <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+            </svg>
+          </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Kalorier</p>
             <p className="font-semibold text-gray-900 dark:text-white">
@@ -566,8 +573,13 @@ function NutritionPreview({ nutrition, onLockedClick }) {
             </p>
           </div>
         </div>
+        {/* Protein */}
         <div className="flex items-center gap-2">
-          <span className="text-lg">💪</span>
+          <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Protein</p>
             <p className="font-semibold text-gray-900 dark:text-white">
@@ -576,8 +588,13 @@ function NutritionPreview({ nutrition, onLockedClick }) {
             </p>
           </div>
         </div>
+        {/* Carbohydrates */}
         <div className="flex items-center gap-2">
-          <span className="text-lg">🌾</span>
+          <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Kolhydrater</p>
             <p className="font-semibold text-gray-900 dark:text-white">
@@ -586,8 +603,13 @@ function NutritionPreview({ nutrition, onLockedClick }) {
             </p>
           </div>
         </div>
+        {/* Fat */}
         <div className="flex items-center gap-2">
-          <span className="text-lg">🥑</span>
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+          </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">Fett</p>
             <p className="font-semibold text-gray-900 dark:text-white">
