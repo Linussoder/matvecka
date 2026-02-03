@@ -8,7 +8,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Resend client - only create if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Email template wrapper
 function createEmailHtml(content, previewText) {
@@ -71,6 +72,10 @@ export async function POST(req) {
     const adminAuth = cookieStore.get('admin_session')
     if (!adminAuth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!resend) {
+      return NextResponse.json({ error: 'Email service not configured (missing RESEND_API_KEY)' }, { status: 503 })
     }
 
     const body = await req.json()
