@@ -34,7 +34,7 @@ export async function GET() {
         { name: '20250203_promo_codes.sql', applied: true },
         { name: '20250203_recipe_sharing.sql', applied: true },
         { name: '20250203_content_recipe_management.sql', applied: true },
-        { name: '20250203_api_deployment_features.sql', applied: false, pending: true },
+        { name: '20250203_api_deployment_features.sql', applied: true },
       ]
 
       return NextResponse.json({
