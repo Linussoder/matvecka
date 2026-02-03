@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import Anthropic from '@anthropic-ai/sdk'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 import sharp from 'sharp'
 
 const supabase = createClient(
@@ -7,9 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const anthropic = createTrackedClaude('flyers-process')
 
 // Crop product image with generous margins to capture full product
 // Expands crop area by 20% in each direction to ensure product is centered

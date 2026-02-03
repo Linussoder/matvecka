@@ -9,7 +9,7 @@ import {
   CurrencyDollarIcon, FlagIcon, SparklesIcon, PencilSquareIcon, CogIcon,
   SunIcon, MoonIcon, Bars3Icon, XMarkIcon, ArrowTopRightOnSquareIcon,
   ArrowRightOnRectangleIcon, ChevronDownIcon, TagIcon, EyeIcon,
-  BookOpenIcon, LanguageIcon
+  BookOpenIcon, LanguageIcon, ServerIcon
 } from '@/components/admin/Icons'
 
 // Beaker icon for experiments
@@ -59,7 +59,9 @@ const contentTools = [
 ]
 
 const systemTools = [
+  { href: '/admin/api-usage', label: 'API-användning', icon: ChartBarIcon },
   { href: '/admin/flags', label: 'Feature Flags', icon: FlagIcon },
+  { href: '/admin/deployments', label: 'Deployment', icon: ServerIcon },
   { href: '/admin/content', label: 'Sajtinnehåll', icon: PencilSquareIcon },
 ]
 

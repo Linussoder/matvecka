@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
-import Anthropic from '@anthropic-ai/sdk'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 import { getUserSubscription } from '@/lib/subscription'
 
 export async function POST(request) {
@@ -110,10 +110,8 @@ export async function POST(request) {
 
     console.log(`📝 Extracted ${truncatedContent.length} characters of text`)
 
-    // Create Anthropic client
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    // Create tracked Anthropic client
+    const anthropic = createTrackedClaude('recipe-import', { userId: user.id })
 
     // Send to Claude for extraction
     const prompt = `Du är en receptexpert. Extrahera receptinformation från denna webbsida.

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 import crypto from 'crypto'
 
 export async function POST(request) {
@@ -48,9 +48,7 @@ export async function POST(request) {
     }
 
     // Calculate nutrition using AI
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    const anthropic = createTrackedClaude('nutrition-calculate')
 
     const nutritionData = await calculateNutrition(anthropic, recipe)
 
@@ -148,9 +146,7 @@ async function calculateAllRecipesForMealPlan(supabase, mealPlanId) {
     throw new Error('No recipes found for meal plan')
   }
 
-  const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  })
+  const anthropic = createTrackedClaude('nutrition-calculate-all')
 
   // Calculate nutrition for each recipe
   for (const recipeWrapper of recipes) {

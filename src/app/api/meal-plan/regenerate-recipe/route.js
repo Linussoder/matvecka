@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 
 export async function POST(request) {
   try {
@@ -21,9 +21,7 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    const anthropic = createTrackedClaude('regenerate-recipe')
 
     // Get meal plan details including stored preferences
     const { data: mealPlan, error: mealPlanError } = await supabase

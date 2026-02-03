@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import Anthropic from '@anthropic-ai/sdk'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 import { canPerformAction } from '@/lib/subscription'
 
 // POST - Get recipe suggestions based on pantry items
@@ -45,9 +45,7 @@ export async function POST(request) {
       )
     }
 
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY
-    })
+    const anthropic = createTrackedClaude('leftovers-suggestions', { userId: user.id })
 
     // Build the prompt
     const ingredientList = ingredients.map(i =>

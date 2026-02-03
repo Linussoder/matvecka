@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { canPerformAction, incrementUsage } from '@/lib/subscription'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 
 // Don't create clients at top level - do it inside the function
 
@@ -13,9 +13,7 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    const anthropic = createTrackedClaude('meal-plan-generate', { userId })
 
     const preferences = await request.json()
 

@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
-import Anthropic from '@anthropic-ai/sdk'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-const anthropic = new Anthropic()
+const anthropic = createTrackedClaude('admin-assistant')
 
 const DB_SCHEMA = `
 Tillgängliga tabeller i databasen:

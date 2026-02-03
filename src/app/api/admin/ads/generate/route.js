@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import Anthropic from '@anthropic-ai/sdk'
+import { createTrackedClaude } from '@/lib/claudeUsageTracker'
 
-const anthropic = new Anthropic()
+const anthropic = createTrackedClaude('ads-generate')
 
 const audiencePrompts = {
   families: 'svenska familjer med barn, fokusera på barnvänlig mat, tidsbesparingar och enkel matplanering',
