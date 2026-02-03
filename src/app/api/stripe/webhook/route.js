@@ -4,6 +4,13 @@ import { stripe } from '@/lib/stripe'
 import { upsertSubscription } from '@/lib/subscription'
 
 export async function POST(request) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe is not configured' },
+      { status: 503 }
+    )
+  }
+
   const body = await request.text()
   const headersList = await headers()
   const signature = headersList.get('stripe-signature')

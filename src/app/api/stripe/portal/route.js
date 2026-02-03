@@ -5,6 +5,13 @@ import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe is not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const cookieStore = await cookies()
 

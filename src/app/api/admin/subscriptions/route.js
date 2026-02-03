@@ -151,6 +151,13 @@ export async function PUT(request) {
 
       case 'cancel_stripe': {
         // Cancel Stripe subscription
+        if (!stripe) {
+          return NextResponse.json(
+            { error: 'Stripe is not configured' },
+            { status: 503 }
+          )
+        }
+
         const { data: subscription } = await supabase
           .from('user_subscriptions')
           .select('stripe_subscription_id')

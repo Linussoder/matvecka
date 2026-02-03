@@ -307,6 +307,10 @@ export async function getOrCreateStripeCustomer(userId, email) {
   // Import stripe here to avoid circular dependency
   const { stripe } = await import('./stripe')
 
+  if (!stripe) {
+    throw new Error('Stripe is not configured')
+  }
+
   // Create new Stripe customer
   const customer = await stripe.customers.create({
     email,

@@ -6,6 +6,13 @@ import { getOrCreateStripeCustomer } from '@/lib/subscription'
 import { validatePromoCode, redeemPromoCode } from '@/lib/promo'
 
 export async function POST(request) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe is not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const cookieStore = await cookies()
 
