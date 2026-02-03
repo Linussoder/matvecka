@@ -13,8 +13,6 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    const anthropic = createTrackedClaude('meal-plan-generate', { userId })
-
     const preferences = await request.json()
 
     console.log('📝 Received preferences:', preferences)
@@ -23,6 +21,8 @@ export async function POST(request) {
     const productMode = preferences.productMode || 'shopping-list'
     const selectedStores = preferences.selectedStores || ['ICA', 'Coop', 'City Gross', 'Willys']
     const userId = preferences.userId
+
+    const anthropic = createTrackedClaude('meal-plan-generate', { userId })
 
     // Check subscription limits before generating
     if (userId) {
