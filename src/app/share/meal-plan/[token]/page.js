@@ -345,6 +345,12 @@ export default function SharedMealPlanPage({ params }) {
                       </div>
                     )}
 
+                    {/* Nutrition Information */}
+                    <NutritionPreview
+                      nutrition={recipeData.nutrition}
+                      onLockedClick={() => handleLockedFeature('näringsvärden')}
+                    />
+
                     {/* Recipe action buttons (locked) */}
                     <div className="flex flex-wrap gap-2 pt-2">
                       <button
@@ -507,6 +513,101 @@ export default function SharedMealPlanPage({ params }) {
           animation: fade-in 0.3s ease-out;
         }
       `}</style>
+    </div>
+  )
+}
+
+function NutritionPreview({ nutrition, onLockedClick }) {
+  // Use actual nutrition data if available, otherwise show example data
+  const hasRealData = nutrition && (nutrition.calories || nutrition.perServing?.calories)
+  const data = hasRealData
+    ? (nutrition.perServing || nutrition)
+    : {
+        calories: 485,
+        protein: 32,
+        carbohydrates: 45,
+        fat: 18,
+        fiber: 6
+      }
+
+  return (
+    <div className="bg-white dark:bg-gray-700/30 rounded-xl p-4 border border-gray-200 dark:border-gray-600 mb-4">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+          <span className="w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+            <span className="text-sm">🔥</span>
+          </span>
+          Näringsvärde per portion
+          {!hasRealData && (
+            <span className="text-xs bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
+              Exempel
+            </span>
+          )}
+        </h4>
+        <button
+          onClick={(e) => { e.stopPropagation(); onLockedClick(); }}
+          className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-1"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          Premium
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🔥</span>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Kalorier</p>
+            <p className="font-semibold text-gray-900 dark:text-white">
+              {Math.round(data.calories || 0)}
+              <span className="text-gray-500 dark:text-gray-400 font-normal text-xs ml-0.5">kcal</span>
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">💪</span>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Protein</p>
+            <p className="font-semibold text-gray-900 dark:text-white">
+              {Math.round(data.protein || 0)}
+              <span className="text-gray-500 dark:text-gray-400 font-normal text-xs ml-0.5">g</span>
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🌾</span>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Kolhydrater</p>
+            <p className="font-semibold text-gray-900 dark:text-white">
+              {Math.round(data.carbohydrates || data.carbs || 0)}
+              <span className="text-gray-500 dark:text-gray-400 font-normal text-xs ml-0.5">g</span>
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🥑</span>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Fett</p>
+            <p className="font-semibold text-gray-900 dark:text-white">
+              {Math.round(data.fat || 0)}
+              <span className="text-gray-500 dark:text-gray-400 font-normal text-xs ml-0.5">g</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Locked detailed nutrition */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onLockedClick(); }}
+        className="w-full mt-3 py-2 bg-gray-100 dark:bg-gray-600/50 text-gray-400 dark:text-gray-500 text-xs rounded-lg flex items-center justify-center gap-2 cursor-not-allowed"
+      >
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Visa detaljerad näringsinformation (fiber, socker, vitaminer...)
+      </button>
     </div>
   )
 }
