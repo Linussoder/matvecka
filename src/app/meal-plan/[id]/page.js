@@ -1,21 +1,47 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
+import MealPlanRecipeCard from '@/components/MealPlanRecipeCard'
+import NutritionSummary from '@/components/NutritionSummary'
+import MealPlanActions from '@/components/MealPlanActions'
+import { getUserSubscription } from '@/lib/subscription'
 
 export default async function MealPlanDetailPage({ params }) {
   const { id } = await params
+  const cookieStore = await cookies()
 
-  // Create client inside function
-  const supabase = createClient(
+  // Create authenticated server client
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+      },
+    }
   )
 
-  // Fetch meal plan
-  const { data: mealPlan, error: planError } = await supabase
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Get subscription status
+  const { plan } = user ? await getUserSubscription(user.id) : { plan: 'free' }
+  const isPremium = plan === 'premium'
+
+  // Fetch meal plan - only if user owns it
+  const query = supabase
     .from('meal_plans')
     .select('*')
     .eq('id', id)
-    .single()
+
+  // If user is logged in, verify ownership
+  if (user) {
+    query.eq('user_id', user.id)
+  }
+
+  const { data: mealPlan, error: planError } = await query.single()
 
   // Fetch recipes
   const { data: recipes, error: recipesError } = await supabase
@@ -26,10 +52,18 @@ export default async function MealPlanDetailPage({ params }) {
 
   if (planError || recipesError || !mealPlan) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-            <p className="text-red-800">Kunde inte ladda matplan</p>
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto text-center">
+            <span className="text-6xl block mb-4">😕</span>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Veckomenyn hittades inte</h1>
+            <p className="text-gray-600 mb-6">Den här veckomenyn kan ha tagits bort eller så finns den inte.</p>
+            <Link
+              href="/meal-plan"
+              className="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+            >
+              ← Tillbaka till veckomenyer
+            </Link>
           </div>
         </div>
       </div>
@@ -39,168 +73,119 @@ export default async function MealPlanDetailPage({ params }) {
   const avgCostPerServing = mealPlan.total_cost / (recipes?.length || 1)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            Matvecka
-          </Link>
-          <nav className="flex gap-6">
-            <Link href="/meal-planner" className="text-gray-600 hover:text-green-600">
-              Ny Matplan
-            </Link>
-            <Link href="/my-plans" className="text-gray-600 hover:text-green-600">
-              Mina Planer
-            </Link>
-            <Link href="/products" className="text-gray-600 hover:text-green-600">
-              Erbjudanden
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <nav className="mb-6">
+          <ol className="flex items-center gap-2 text-sm text-gray-500">
+            <li>
+              <Link href="/" className="hover:text-green-600 transition-colors">Hem</Link>
+            </li>
+            <li>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </li>
+            <li>
+              <Link href="/meal-plan" className="hover:text-green-600 transition-colors">Veckomenyer</Link>
+            </li>
+            <li>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </li>
+            <li className="text-gray-900 font-medium truncate max-w-[200px]">{mealPlan.name}</li>
+          </ol>
+        </nav>
 
-      <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Back Button */}
-          <Link
-            href="/my-plans"
-            className="text-green-600 hover:text-green-700 mb-4 inline-flex items-center gap-2"
-          >
-            ← Tillbaka till mina planer
-          </Link>
-
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">{mealPlan.name}</h1>
-            <p className="text-gray-600">
-              Vecka {new Date(mealPlan.week_start_date).toLocaleDateString('sv-SE')} • {recipes?.length || 0} recept
-            </p>
-          </div>
-
-          {/* Summary */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
-            <div className="grid md:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-start justify-between gap-4 mb-4">
               <div>
-                <span className="text-green-700">Antal recept:</span>
-                <span className="font-semibold ml-2">{recipes?.length || 0}</span>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{mealPlan.name}</h1>
+                <p className="text-gray-600">
+                  Vecka {new Date(mealPlan.week_start_date).toLocaleDateString('sv-SE')} • {recipes?.length || 0} recept • {mealPlan.servings} portioner
+                </p>
               </div>
-              <div>
-                <span className="text-green-700">Total kostnad:</span>
-                <span className="font-semibold ml-2">{mealPlan.total_cost} kr</span>
-              </div>
-              <div>
-                <span className="text-green-700">Snitt per portion:</span>
-                <span className="font-semibold ml-2">{avgCostPerServing.toFixed(2)} kr</span>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-green-600">{mealPlan.total_cost?.toFixed(0) || '—'} kr</div>
+                <div className="text-sm text-gray-500">Total kostnad</div>
               </div>
             </div>
           </div>
 
-          {/* Action Button */}
+          {/* Stats Cards */}
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">{recipes?.length || 0}</div>
+              <div className="text-gray-600 text-sm">Recept</div>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">{mealPlan.total_cost?.toFixed(0) || '—'} kr</div>
+              <div className="text-gray-600 text-sm">Total kostnad</div>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">{avgCostPerServing.toFixed(0)} kr</div>
+              <div className="text-gray-600 text-sm">Per portion</div>
+            </div>
+          </div>
+
+          {/* Nutrition Summary */}
           <div className="mb-8">
-            <Link
-              href={`/shopping-list/${id}`}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Visa Inköpslista
-            </Link>
+            <NutritionSummary mealPlanId={id} mealPlan={mealPlan} isPremium={isPremium} />
+          </div>
+
+          {/* Action Buttons */}
+          <MealPlanActions
+            mealPlanId={id}
+            mealPlanName={mealPlan.name}
+            recipes={recipes || []}
+            isPremium={isPremium}
+          />
+
+          {/* Section Title */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Veckans recept</h2>
+            <p className="text-gray-600 text-sm">Klicka på ett recept för att se ingredienser och instruktioner</p>
           </div>
 
           {/* Recipes */}
           <div className="space-y-4">
             {recipes?.map((recipeWrapper) => (
-              <RecipeCard
+              <MealPlanRecipeCard
                 key={recipeWrapper.id}
                 recipe={recipeWrapper.recipe_data}
                 day={recipeWrapper.day_number}
+                mealPlanRecipeId={recipeWrapper.id}
+                mealPlanId={id}
+                isPremium={isPremium}
               />
             ))}
           </div>
-        </div>
-      </main>
-    </div>
-  )
-}
 
-function RecipeCard({ recipe, day }) {
-  const dayNames = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag', 'Söndag']
+          {/* CTA Section */}
+          <div className="mt-12 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
 
-  return (
-    <details className="bg-white rounded-xl shadow-sm overflow-hidden group">
-      <summary className="p-6 cursor-pointer hover:bg-gray-50 transition-colors">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                {dayNames[day - 1]}
-              </span>
-              <span className="text-gray-500 text-sm">Dag {day}</span>
+            <div className="relative z-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                Gillade du denna veckomeny?
+              </h2>
+              <p className="text-green-100 mb-6 max-w-xl mx-auto">
+                Skapa en ny veckomeny för nästa vecka med ännu fler sparmöjligheter
+              </p>
+              <Link
+                href="/meal-planner"
+                className="inline-block px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
+              >
+                Skapa ny veckomeny →
+              </Link>
             </div>
-            <h3 className="text-xl font-bold text-gray-900">{recipe.name}</h3>
-            <p className="text-gray-600 mt-1">{recipe.description}</p>
-          </div>
-          <div className="text-gray-400 group-open:rotate-180 transition-transform ml-4">
-            ▼
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-4">
-          <span className="flex items-center gap-1">
-            {recipe.prepTime || recipe.prep_time} + {recipe.cookTime || recipe.cook_time}
-          </span>
-          <span className="flex items-center gap-1">
-            {recipe.servings} portioner
-          </span>
-          <span className="flex items-center gap-1 text-green-600 font-semibold">
-            {recipe.estimatedCost || 'N/A'} kr
-          </span>
-          <span className="flex items-center gap-1">
-            {recipe.difficulty}
-          </span>
-        </div>
-      </summary>
-
-      <div className="px-6 pb-6 pt-0 border-t border-gray-200">
-        {/* Ingredients */}
-        <div className="mb-6 mt-6">
-          <h4 className="font-semibold text-gray-900 mb-3">Ingredienser:</h4>
-          <ul className="space-y-2">
-            {recipe.ingredients?.map((ing, i) => (
-              <li key={i} className="flex items-start gap-2 text-gray-700">
-                <span className="text-green-600 mt-1">•</span>
-                <span>
-                  {ing.amount} {ing.unit} {ing.name}
-                  {ing.notes && <span className="text-gray-500 text-sm"> ({ing.notes})</span>}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Instructions */}
-        <div className="mb-6">
-          <h4 className="font-semibold text-gray-900 mb-3">Instruktioner:</h4>
-          <ol className="space-y-3">
-            {recipe.instructions?.map((step, i) => (
-              <li key={i} className="flex gap-3 text-gray-700">
-                <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-medium">
-                  {i + 1}
-                </span>
-                <span className="flex-1">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* Tips */}
-        {recipe.tips && (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              <strong>Tips:</strong> {recipe.tips}
-            </p>
-          </div>
-        )}
       </div>
-    </details>
+    </div>
   )
 }

@@ -118,6 +118,58 @@ export function ShoppingListProvider({ children }) {
     setItems(prev => prev.filter(item => !item.checked))
   }, [])
 
+  // Add recipe ingredients to list (for favorites/meal plan recipes)
+  const addIngredients = useCallback((ingredients, recipeName) => {
+    if (!ingredients || ingredients.length === 0) return false
+
+    setItems(prev => {
+      // Create a deep copy to avoid mutation issues
+      const updatedItems = prev.map(item => ({ ...item }))
+
+      ingredients.forEach(ing => {
+        const ingredientName = typeof ing === 'string' ? ing : (ing.name || '')
+        const ingredientUnit = typeof ing === 'string' ? '' : (ing.unit || '')
+        // Normalize amount to string for consistent comparison
+        const ingredientAmount = typeof ing === 'string' ? '' : String(ing.amount || '')
+
+        // Check if this ingredient already exists (match by name, unit, AND amount)
+        const existingIndex = updatedItems.findIndex(item =>
+          item.source === 'recipe' &&
+          item.name?.toLowerCase() === ingredientName.toLowerCase() &&
+          item.unit === ingredientUnit &&
+          String(item.amount || '') === ingredientAmount
+        )
+
+        if (existingIndex >= 0) {
+          // Increment quantity of existing item
+          updatedItems[existingIndex] = {
+            ...updatedItems[existingIndex],
+            quantity: updatedItems[existingIndex].quantity + 1
+          }
+        } else {
+          // Add new item
+          updatedItems.push({
+            id: `ing-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+            productId: null,
+            name: ingredientName,
+            price: 0,
+            unit: ingredientUnit,
+            amount: ingredientAmount,
+            store: null,
+            quantity: 1,
+            checked: false,
+            source: 'recipe',
+            recipeName: recipeName,
+            addedAt: new Date().toISOString()
+          })
+        }
+      })
+
+      return updatedItems
+    })
+    return true
+  }, [])
+
   // Check if product is in list
   const isInList = useCallback((productId) => {
     return items.some(item => item.productId === productId)
@@ -153,6 +205,7 @@ export function ShoppingListProvider({ children }) {
     loading,
     user,
     addItem,
+    addIngredients,
     removeItem,
     updateQuantity,
     toggleChecked,

@@ -22,7 +22,7 @@ export default function NotFound() {
             href="/meal-planner"
             className="px-6 py-3 bg-white text-green-600 border border-green-600 rounded-lg hover:bg-green-50 transition-colors"
           >
-            Skapa matplan
+            Skapa veckomeny
           </Link>
         </div>
       </div>

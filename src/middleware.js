@@ -2,6 +2,19 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function middleware(request) {
+  // Check if accessing admin routes (except login and API)
+  if (
+    request.nextUrl.pathname.startsWith('/admin') &&
+    !request.nextUrl.pathname.startsWith('/admin/login') &&
+    !request.nextUrl.pathname.startsWith('/api/admin')
+  ) {
+    const adminSession = request.cookies.get('admin_session')
+
+    if (!adminSession?.value) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })

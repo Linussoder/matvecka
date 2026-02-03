@@ -11,35 +11,36 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-// Crop product image from the CENTER of a grid cell
+// Crop product image with generous margins to capture full product
+// Expands crop area by 20% in each direction to ensure product is centered
 async function cropProductImage(pageImageBuffer, product, flyerId, productId) {
   try {
     const metadata = await sharp(pageImageBuffer).metadata()
     const imgWidth = metadata.width
     const imgHeight = metadata.height
 
-    // Calculate center of the hotspot
-    const centerX = product.x + (product.width / 2)
-    const centerY = product.y + (product.height / 2)
-
-    // Crop a square region from the center (70% of cell size for product image)
-    const cropSize = Math.min(product.width, product.height) * 0.7
-    const cropX = centerX - (cropSize / 2)
-    const cropY = centerY - (cropSize / 2)
+    // Expand crop area by 20% in each direction for a more generous crop
+    // This ensures we capture the full product even if hotspot is slightly off
+    const expandPercent = 0.20
+    const cropX = Math.max(0, product.x - (product.width * expandPercent))
+    const cropY = Math.max(0, product.y - (product.height * expandPercent))
+    const cropWidth = Math.min(100 - cropX, product.width * (1 + expandPercent * 2))
+    const cropHeight = Math.min(100 - cropY, product.height * (1 + expandPercent * 2))
 
     // Convert percentages to pixels
     const left = Math.round((cropX / 100) * imgWidth)
     const top = Math.round((cropY / 100) * imgHeight)
-    const width = Math.round((cropSize / 100) * imgWidth)
-    const height = Math.round((cropSize / 100) * imgHeight)
+    const width = Math.round((cropWidth / 100) * imgWidth)
+    const height = Math.round((cropHeight / 100) * imgHeight)
 
     // Ensure values are within bounds
-    const safeLeft = Math.max(0, Math.min(left, imgWidth - 1))
-    const safeTop = Math.max(0, Math.min(top, imgHeight - 1))
-    const safeWidth = Math.min(width, imgWidth - safeLeft)
-    const safeHeight = Math.min(height, imgHeight - safeTop)
+    const safeLeft = Math.max(0, Math.min(left, imgWidth - 10))
+    const safeTop = Math.max(0, Math.min(top, imgHeight - 10))
+    const safeWidth = Math.min(Math.max(width, 50), imgWidth - safeLeft)
+    const safeHeight = Math.min(Math.max(height, 50), imgHeight - safeTop)
 
-    if (safeWidth < 10 || safeHeight < 10) {
+    if (safeWidth < 30 || safeHeight < 30) {
+      console.log('Crop area too small, skipping')
       return null
     }
 
@@ -50,7 +51,7 @@ async function cropProductImage(pageImageBuffer, product, flyerId, productId) {
         width: safeWidth,
         height: safeHeight
       })
-      .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
+      .resize(400, 400, { fit: 'cover', position: 'top' })  // Cover with focus on top (product image)
       .png()
       .toBuffer()
 
@@ -78,78 +79,8 @@ async function cropProductImage(pageImageBuffer, product, flyerId, productId) {
   }
 }
 
-// STEP 1: Analyze the flyer's grid structure
-async function analyzeGridStructure(fileBuffer, mediaType, store) {
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: mediaType,
-              data: fileBuffer.toString('base64'),
-            },
-          },
-          {
-            type: 'text',
-            text: `Analysera layouten för detta ${store} reklamblad.
-
-Räkna antalet KOLUMNER och RADER av produktrutor i reklamet.
-
-VIKTIGT:
-- Varje produkt har typiskt en bild + pristext i en ruta
-- Räkna endast synliga produktrutor (inte tomma ytor eller banners)
-- Ignorera sidhuvud/sidfot/logotyper
-
-Svara ENDAST med JSON:
-{
-  "columns": <antal kolumner, typiskt 2-5>,
-  "rows": <antal rader, typiskt 2-6>,
-  "hasHeader": <true om det finns header/banner högst upp>,
-  "headerHeight": <uppskattad höjd i % om header finns, annars 0>,
-  "hasFooter": <true om det finns footer längst ner>,
-  "footerHeight": <uppskattad höjd i % om footer finns, annars 0>,
-  "notes": "<eventuella observationer om layouten>"
-}`
-          }
-        ],
-      }
-    ],
-  })
-
-  const content = response.content[0].text
-  const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  return JSON.parse(jsonStr)
-}
-
-// STEP 2: Identify products in each grid cell
-async function identifyProductsInGrid(fileBuffer, mediaType, store, gridInfo) {
-  const { columns, rows, hasHeader, headerHeight, hasFooter, footerHeight } = gridInfo
-
-  // Calculate usable area
-  const startY = hasHeader ? headerHeight : 0
-  const endY = hasFooter ? (100 - footerHeight) : 100
-  const usableHeight = endY - startY
-
-  // Calculate cell dimensions
-  const cellWidth = 100 / columns
-  const cellHeight = usableHeight / rows
-
-  // Build cell reference for AI
-  let cellReference = 'Grid-celler (rad, kolumn):\n'
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const cellX = col * cellWidth
-      const cellY = startY + (row * cellHeight)
-      cellReference += `[${row + 1},${col + 1}]: x=${cellX.toFixed(0)}%-${(cellX + cellWidth).toFixed(0)}%, y=${cellY.toFixed(0)}%-${(cellY + cellHeight).toFixed(0)}%\n`
-    }
-  }
-
+// Extract products with direct bounding box coordinates (no grid assumption)
+async function extractProductsWithBoundingBoxes(fileBuffer, mediaType, store) {
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
@@ -167,28 +98,30 @@ async function identifyProductsInGrid(fileBuffer, mediaType, store, gridInfo) {
           },
           {
             type: 'text',
-            text: `Detta ${store} reklamblad har ${columns} kolumner och ${rows} rader med produkter.
+            text: `Analysera detta ${store} reklamblad och identifiera ALLA produkter med erbjudanden.
 
-${cellReference}
-
-För VARJE cell som innehåller en produkt, identifiera:
-- row: Radnummer (1-${rows})
-- col: Kolumnnummer (1-${columns})
+För VARJE produkt, ange dessa fält (alla är obligatoriska):
 - name: Produktnamn på svenska
-- price: Pris i kronor (endast siffror, t.ex. 29.90)
+- price: Pris i kronor (endast nummer, t.ex. 29.90 eller 49)
 - original_price: Ordinarie pris om det visas (annars null)
 - unit: Enhet (st, kg, l, förp, etc.)
-- category: Kategori (Kött, Fisk, Mejeri, Grönsaker, Frukt, Fryst, Skafferi, Bröd, Dryck, Snacks, Hygien, Övrigt)
+- category: En av: Kött, Fisk, Mejeri, Grönsaker, Frukt, Fryst, Skafferi, Bröd, Dryck, Snacks, Hygien, Övrigt
+- x: Vänster kant av produktrutan i PROCENT av bildens bredd (0-100)
+- y: ÖVRE kant där PRODUKTBILDEN börjar i PROCENT av bildens höjd (0-100)
+- width: Produktrutans bredd i PROCENT (typiskt 15-35)
+- height: Produktrutans TOTALA höjd i PROCENT (typiskt 20-35)
 
-VIKTIGT:
-- En produkt per cell
-- Hoppa över tomma celler eller celler utan produkt
-- Ignorera icke-matprodukter
+KRITISKT för koordinaterna:
+- y ska peka på TOPPEN där produktbilden/förpackningen BÖRJAR (inte pristexten!)
+- Produktbilder är vanligtvis OVANFÖR pristexten i reklamblad
+- Inkludera HELA produktrutan från produktbild överst till pris nederst
+- Mät från bildens absoluta övre vänstra hörn (0,0)
+- height ska inkludera både produktbild OCH pristext
 
-Svara ENDAST med JSON-array:
+Svara ENDAST med en JSON-array (ingen annan text):
 [
-  {"row": 1, "col": 1, "name": "Kycklingfilé", "price": 89.90, "original_price": 129, "unit": "kg", "category": "Kött"},
-  {"row": 1, "col": 2, "name": "Mjölk", "price": 15, "original_price": null, "unit": "l", "category": "Mejeri"}
+  {"name": "Kycklingfilé", "price": 89.90, "original_price": 129, "unit": "kg", "category": "Kött", "x": 0, "y": 10, "width": 25, "height": 28},
+  {"name": "Mjölk", "price": 15, "original_price": null, "unit": "l", "category": "Mejeri", "x": 25, "y": 10, "width": 25, "height": 28}
 ]`
           }
         ],
@@ -198,28 +131,27 @@ Svara ENDAST med JSON-array:
 
   const content = response.content[0].text
   const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+
   const products = JSON.parse(jsonStr)
 
-  // Convert grid positions to hotspot coordinates
+  // Validate and normalize coordinates
+  // Apply Y-offset correction: shift UP by 15% of height to compensate for AI
+  // tendency to detect from middle/price area instead of top of product image
   return products.map(p => {
-    const cellX = (p.col - 1) * cellWidth
-    const cellY = startY + ((p.row - 1) * cellHeight)
-
-    // Add small padding (2%) to avoid edge overlap
-    const padding = 1
+    const rawY = p.y || 0
+    const height = Math.max(5, Math.min(50, p.height || 25))
+    const yOffset = height * 0.15  // Shift up by 15% of height
+    const adjustedY = Math.max(0, rawY - yOffset)
 
     return {
-      name: p.name,
-      price: p.price,
-      original_price: p.original_price,
+      ...p,
+      x: Math.max(0, Math.min(100, p.x || 0)),
+      y: adjustedY,
+      width: Math.max(5, Math.min(50, p.width || 20)),
+      height: height,
       unit: p.unit || 'st',
       category: p.category || 'Övrigt',
-      x: cellX + padding,
-      y: cellY + padding,
-      width: cellWidth - (padding * 2),
-      height: cellHeight - (padding * 2),
-      confidence: 0.9,
-      gridPosition: { row: p.row, col: p.col }
+      confidence: 0.85,
     }
   })
 }
@@ -248,98 +180,44 @@ export async function POST(request) {
     const fileResponse = await fetch(pageImageUrl)
     let fileBuffer = Buffer.from(await fileResponse.arrayBuffer())
 
-    // Compress image if too large (Claude API limit is 5MB)
-    const MAX_SIZE = 4 * 1024 * 1024 // 4MB to be safe
+    // Detect image format and compress if needed
+    // Claude API has 5MB limit, but base64 encoding adds ~33% overhead
+    // So we need to keep the raw file under ~3.5MB to be safe
+    let mediaType = 'image/png' // Default since our pages are stored as PNG
+    const MAX_SIZE = 3.5 * 1024 * 1024 // 3.5MB to account for base64 overhead
+
     if (fileBuffer.length > MAX_SIZE) {
       console.log(`Image too large (${(fileBuffer.length / 1024 / 1024).toFixed(1)}MB), compressing...`)
       fileBuffer = await sharp(fileBuffer)
-        .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: 80 })
+        .resize(1800, 1800, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 70 })
         .toBuffer()
+      mediaType = 'image/jpeg' // Now it's JPEG after compression
       console.log(`Compressed to ${(fileBuffer.length / 1024 / 1024).toFixed(1)}MB`)
-    }
 
-    const mediaType = 'image/jpeg'
-
-    let products = []
-
-    // GRID-BASED DETECTION (Two-pass approach)
-    console.log('STEP 1: Analyzing grid structure...')
-
-    try {
-      const gridInfo = await analyzeGridStructure(fileBuffer, mediaType, store)
-      console.log(`Grid detected: ${gridInfo.columns} columns x ${gridInfo.rows} rows`)
-      console.log(`Header: ${gridInfo.hasHeader ? gridInfo.headerHeight + '%' : 'none'}, Footer: ${gridInfo.hasFooter ? gridInfo.footerHeight + '%' : 'none'}`)
-
-      console.log('STEP 2: Identifying products in grid cells...')
-      products = await identifyProductsInGrid(fileBuffer, mediaType, store, gridInfo)
-      console.log(`Found ${products.length} products using grid-based detection`)
-
-    } catch (gridError) {
-      console.error('Grid-based detection failed, using fallback:', gridError)
-
-      // FALLBACK: Simple AI extraction
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: {
-                  type: 'base64',
-                  media_type: mediaType,
-                  data: fileBuffer.toString('base64'),
-                },
-              },
-              {
-                type: 'text',
-                text: `Analysera detta ${store} reklamblad och extrahera ALLA produkter.
-
-För varje produkt, ange:
-1. name: Produktnamn (svenska)
-2. price: Pris i kronor (nummer)
-3. original_price: Ordinarie pris om visat (annars null)
-4. unit: Enhet (st, kg, l, förp)
-5. category: Kategori (Kött, Fisk, Mejeri, Grönsaker, Frukt, Fryst, Skafferi, Bröd, Dryck, Snacks, Hygien, Övrigt)
-6. x: Vänster kant i procent (0-100)
-7. y: Övre kant i procent (0-100)
-8. width: Bredd i procent (typiskt 20-35)
-9. height: Höjd i procent (typiskt 15-25)
-
-Svara ENDAST med JSON-array:
-[{"name": "Kycklingfilé", "price": 89.90, "original_price": 129, "unit": "kg", "category": "Kött", "x": 0, "y": 10, "width": 25, "height": 20}]`
-              }
-            ],
-          }
-        ],
-      })
-
-      try {
-        const content = response.content[0].text
-        const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-        products = JSON.parse(jsonStr).map(p => ({
-          ...p,
-          unit: p.unit || 'st',
-          category: p.category || 'Övrigt',
-          confidence: 0.7,
-        }))
-      } catch (parseError) {
-        console.error('Failed to parse fallback AI response:', parseError)
-        return Response.json({ error: 'Failed to parse AI response' }, { status: 500 })
+      // If still too large, compress more aggressively
+      if (fileBuffer.length > MAX_SIZE) {
+        console.log('Still too large, compressing more...')
+        fileBuffer = await sharp(fileBuffer)
+          .resize(1400, 1400, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 60 })
+          .toBuffer()
+        console.log(`Compressed to ${(fileBuffer.length / 1024 / 1024).toFixed(1)}MB`)
       }
     }
 
-    // Validate coordinates
-    products = products.map(p => ({
-      ...p,
-      x: Math.max(0, Math.min(100 - (p.width || 20), p.x || 0)),
-      y: Math.max(0, Math.min(100 - (p.height || 18), p.y || 0)),
-      width: Math.max(5, Math.min(50, p.width || 22)),
-      height: Math.max(5, Math.min(40, p.height || 18)),
-    }))
+    let products = []
+
+    // DIRECT BOUNDING BOX DETECTION (single-pass, more accurate)
+    console.log('Extracting products with direct bounding boxes...')
+
+    try {
+      products = await extractProductsWithBoundingBoxes(fileBuffer, mediaType, store)
+      console.log(`Found ${products.length} products with bounding box detection`)
+    } catch (extractError) {
+      console.error('Product extraction failed:', extractError)
+      return Response.json({ error: 'Failed to extract products: ' + extractError.message }, { status: 500 })
+    }
 
     // Save products and hotspots to database
     const savedProducts = []

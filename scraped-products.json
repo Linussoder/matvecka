@@ -1,0 +1,130 @@
+[
+  {
+    "name": "Erbjudande",
+    "price": 12.5,
+    "unit": "st",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d425dda2-dc6e-4c6e-be33-f15f69127ce3/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/tortilla-original-medium-8-p-320g-santa-maria/2043890"
+  },
+  {
+    "name": "Påsklämmor Blandade färger 20-p Twixit",
+    "price": 15,
+    "unit": "st",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/fd24ba83-9aec-4a6a-b932-f5314c9ffe6e/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/påsklämmor-blandade-färger-20-p-twixit/1352518"
+  },
+  {
+    "name": "Brago 225g Göteborgs",
+    "price": 17,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/457ef04c-ef17-4769-b06f-f9f9bf2e0a25/300x300.jpg",
+    "category": "dryck",
+    "url": "https://handla.ica.se/stores/1004084/products/brago-225g-göteborgs/1004714"
+  },
+  {
+    "name": "Bearnaise 230ml Eriks såser",
+    "price": 17.5,
+    "unit": "ml",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/2ed2a38f-19a6-45b9-957b-d1f5d4980094/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/bearnaise-230ml-eriks-såser/1354055"
+  },
+  {
+    "name": "Proteinmilkshake Chocolate 330ml Barebells",
+    "price": 18.75,
+    "unit": "ml",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9e02c287-d751-433b-8e1f-9bd07bd60b9e/300x300.jpg",
+    "category": "dryck",
+    "url": "https://handla.ica.se/stores/1004084/products/proteinmilkshake-chocolate-330ml-barebells/2005986"
+  },
+  {
+    "name": "Oxfond med Rödvin 180ml Touch of Taste",
+    "price": 29,
+    "unit": "ml",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/58a07b11-4d1b-428f-9c5f-43a2c919f981/300x300.jpg",
+    "category": "dryck",
+    "url": "https://handla.ica.se/stores/1004084/products/oxfond-med-rödvin-180ml-touch-of-taste/1130117"
+  },
+  {
+    "name": "Grön Sparrissoppa 5dl Kelda",
+    "price": 24,
+    "unit": "st",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/1d0c8cac-9684-4115-b7bf-5d2f0c5192d8/300x300.jpg",
+    "category": "spannmål",
+    "url": "https://handla.ica.se/stores/1004084/products/grön-sparrissoppa-5dl-kelda/1344346"
+  },
+  {
+    "name": "Cheddar mild 32% ca 500g Kvibille",
+    "price": 0,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/746caf6a-b5c0-461e-847a-0d1d7a4c2ffb/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/cheddar-mild-32-ca-500g-kvibille/1280666"
+  },
+  {
+    "name": "Proteinbar Caramel Choco 55g Barebells",
+    "price": 18.75,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6610f076-5edb-4049-9356-085b8281b89c/300x300.jpg",
+    "category": "dryck",
+    "url": "https://handla.ica.se/stores/1004084/products/proteinbar-caramel-choco-55g-barebells/2090765"
+  },
+  {
+    "name": "Thai cube sweet chili chicken 350g Kitchen Joy",
+    "price": 29.67,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/95eb35a9-e8b2-4690-91b1-5965420915cb/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/thai-cube-sweet-chili-chicken-350g-kitchen-joy/2050239"
+  },
+  {
+    "name": "Kalkon Rökt 120g Pärsons",
+    "price": 20,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9fa0a530-08fc-48d1-b1d5-a7f8d34072be/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/kalkon-rökt-120g-pärsons/1276500"
+  },
+  {
+    "name": "Tacosås Extra Het 230g Santa Maria",
+    "price": 12.5,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/cd1e4c94-dd78-446f-9b5f-f7fc38ae463a/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/tacosås-extra-het-230g-santa-maria/2061547"
+  },
+  {
+    "name": "Pizzadeg Napoli XXL PIZZA PIZZERIA 500 Gram POP! Bakery",
+    "price": 0,
+    "unit": "st",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/abbe78f9-a95a-4c8b-9d22-cd4bd89f8950/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/pizzadeg-napoli-xxl-pizza-pizzeria-500-gram-pop-bakery/2154340"
+  },
+  {
+    "name": "Mellanmål Blåbär 175g Risifrutti",
+    "price": 11,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/42907be4-a270-448c-85b0-de72a8212209/300x300.jpg",
+    "category": "frukt",
+    "url": "https://handla.ica.se/stores/1004084/products/mellanmål-blåbär-175g-risifrutti/1023286"
+  },
+  {
+    "name": "Rödbetor förkokta 500g ICA",
+    "price": 0,
+    "unit": "g",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5bb92e1c-f1f4-41a8-b024-677b895421be/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/rödbetor-förkokta-500g-ica/2009588"
+  },
+  {
+    "name": "Byxblöjor Up&Go Strl 7 16-26kg 24-p Libero",
+    "price": 79.5,
+    "unit": "kg",
+    "image_url": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/21a26b97-072b-4079-bd7f-0ef81a71335a/300x300.jpg",
+    "category": "övrigt",
+    "url": "https://handla.ica.se/stores/1004084/products/byxblöjor-up-go-strl-7-16-26kg-24-p-libero/2143836"
+  }
+]

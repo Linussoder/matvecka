@@ -3,12 +3,34 @@
 import { useState } from 'react'
 import { useFavorites } from '@/lib/FavoritesContext'
 
-export default function FavoriteButton({ recipe, variant = 'default', className = '' }) {
-  const { isFavorite, toggleFavorite, user } = useFavorites()
+/**
+ * FavoriteButton - Works with both regular recipes and meal plan recipes
+ *
+ * For regular recipes: pass recipe with recipe.id
+ * For meal plan recipes: pass mealPlanRecipeId and recipeData props
+ */
+export default function FavoriteButton({
+  recipe,
+  mealPlanRecipeId,
+  recipeData,
+  variant = 'default',
+  className = ''
+}) {
+  const {
+    isFavorite,
+    toggleFavorite,
+    isMealPlanFavorite,
+    toggleMealPlanFavorite,
+    user
+  } = useFavorites()
   const [isLoading, setIsLoading] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
 
-  const isFav = isFavorite(recipe.id)
+  // Determine if this is a meal plan recipe or regular recipe
+  const isMealPlanRecipe = !!mealPlanRecipeId
+  const isFav = isMealPlanRecipe
+    ? isMealPlanFavorite(mealPlanRecipeId)
+    : isFavorite(recipe?.id)
 
   const handleClick = async (e) => {
     e.preventDefault()
@@ -21,7 +43,11 @@ export default function FavoriteButton({ recipe, variant = 'default', className 
     }
 
     setIsLoading(true)
-    await toggleFavorite(recipe.id)
+    if (isMealPlanRecipe) {
+      await toggleMealPlanFavorite(mealPlanRecipeId, recipeData || recipe)
+    } else {
+      await toggleFavorite(recipe.id)
+    }
     setIsLoading(false)
   }
 

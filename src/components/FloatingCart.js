@@ -24,10 +24,16 @@ export default function FloatingCart() {
 
   const handleShare = async () => {
     const listText = items
-      .map(item => `${item.checked ? '✓' : '○'} ${item.name} (${item.quantity}st) - ${item.price * item.quantity} kr`)
+      .map(item => {
+        if (item.source === 'recipe') {
+          const amount = item.amount ? `${item.amount} ${item.unit || ''}`.trim() : ''
+          return `${item.checked ? '✓' : '○'} ${item.name}${amount ? ` (${amount})` : ''}`
+        }
+        return `${item.checked ? '✓' : '○'} ${item.name} (${item.quantity}st) - ${item.price * item.quantity} kr`
+      })
       .join('\n')
 
-    const fullText = `Min inköpslista från Matvecka:\n\n${listText}\n\nTotalt: ${totalPrice.toFixed(0)} kr`
+    const fullText = `Min inköpslista från Matvecka:\n\n${listText}${totalPrice > 0 ? `\n\nTotalt: ${totalPrice.toFixed(0)} kr` : ''}`
 
     if (navigator.share) {
       try {
@@ -127,7 +133,14 @@ export default function FloatingCart() {
                           {item.name}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {item.price} kr/{item.unit || 'st'}
+                          {item.source === 'recipe' ? (
+                            <>
+                              {item.amount && `${item.amount} `}{item.unit}
+                              {item.recipeName && <span className="text-green-600 ml-1">({item.recipeName})</span>}
+                            </>
+                          ) : (
+                            <>{item.price} kr/{item.unit || 'st'}</>
+                          )}
                         </p>
                       </div>
 
@@ -151,11 +164,13 @@ export default function FloatingCart() {
                       </div>
 
                       {/* Price */}
-                      <div className="text-right w-16">
-                        <p className="text-sm font-medium text-gray-900">
-                          {(item.price * item.quantity).toFixed(0)} kr
-                        </p>
-                      </div>
+                      {item.source !== 'recipe' && (
+                        <div className="text-right w-16">
+                          <p className="text-sm font-medium text-gray-900">
+                            {(item.price * item.quantity).toFixed(0)} kr
+                          </p>
+                        </div>
+                      )}
 
                       {/* Remove */}
                       <button

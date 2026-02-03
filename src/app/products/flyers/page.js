@@ -1,19 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import Link from 'next/link'
 import ProductsNav from '@/components/ProductsNav'
 import { useShoppingList } from '@/contexts/ShoppingListContext'
 
-const stores = ['Alla', 'ICA', 'Coop', 'City Gross', 'Willys', 'Lidl']
+const stores = ['Alla', 'ICA', 'Coop', 'Willys']
 
 const storeColors = {
   'ICA': 'bg-red-500',
   'Coop': 'bg-green-600',
   'City Gross': 'bg-blue-600',
   'Willys': 'bg-orange-500',
-  'Lidl': 'bg-yellow-500',
   'Hemköp': 'bg-red-600',
 }
 
@@ -47,12 +46,12 @@ export default function FlyersPage() {
         console.error('Error loading flyers:', error)
       }
 
-      // Only show flyers that have at least one page with an image
-      const flyersWithPages = (data || []).filter(f =>
-        f.pages?.some(p => p.image_url && !p.image_url.includes('.pdf'))
+      // Show flyers that have a PDF or at least one page with an image
+      const flyersWithContent = (data || []).filter(f =>
+        f.pdf_url || f.pages?.some(p => p.image_url && !p.image_url.includes('.pdf'))
       )
 
-      setFlyers(flyersWithPages)
+      setFlyers(flyersWithContent)
       setLoading(false)
     }
     loadFlyers()
@@ -71,7 +70,7 @@ export default function FlyersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
       <ProductsNav />
 
       <div className="container mx-auto px-4 py-8">
@@ -84,7 +83,7 @@ export default function FlyersPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 selectedStore === store
                   ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
               }`}
             >
               {store}
@@ -96,10 +95,10 @@ export default function FlyersPage() {
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
-                <div className="aspect-[3/4] bg-gray-200 rounded-lg mb-3" />
-                <div className="h-4 bg-gray-200 rounded mb-2" />
-                <div className="h-3 bg-gray-200 rounded w-2/3" />
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 animate-pulse">
+                <div className="aspect-3/4 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
               </div>
             ))}
           </div>
@@ -121,8 +120,8 @@ export default function FlyersPage() {
 
         {!loading && filteredFlyers.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-gray-500">Inga reklamblad hittades</p>
-            <p className="text-sm text-gray-400 mt-1">Ladda upp reklamblad i admin-panelen</p>
+            <p className="text-gray-500 dark:text-gray-400">Inga reklamblad hittades</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Ladda upp reklamblad i admin-panelen</p>
           </div>
         )}
 
@@ -137,13 +136,13 @@ export default function FlyersPage() {
                 Vill du spara ännu mer?
               </h2>
               <p className="text-green-100 mb-6 max-w-xl mx-auto">
-                Skapa en matplan baserad på veckans bästa erbjudanden
+                Skapa en veckomeny baserad på veckans bästa erbjudanden
               </p>
               <Link
                 href="/meal-planner"
                 className="inline-block px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
               >
-                Skapa matplan gratis →
+                Skapa veckomeny gratis →
               </Link>
             </div>
           </div>
@@ -167,22 +166,35 @@ function FlyerCard({ flyer, onSelect, formatDate }) {
     (sum, page) => sum + (page.hotspots?.length || 0),
     0
   ) || 0
+  const hasPdf = !!flyer.pdf_url
 
   return (
     <div
-      className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 overflow-hidden group cursor-pointer"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 dark:border-gray-700 overflow-hidden group cursor-pointer"
       onClick={onSelect}
     >
       {/* Flyer Preview */}
-      <div className="aspect-[3/4] relative bg-gray-100">
-        {firstPage?.image_url ? (
+      <div className="aspect-3/4 relative bg-gray-100 dark:bg-gray-700">
+        {hasPdf ? (
+          // Show original PDF as preview using browser's native rendering
+          <object
+            data={`${flyer.pdf_url}#page=1&toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+            type="application/pdf"
+            className="w-full h-full pointer-events-none"
+          >
+            {/* Fallback if object doesn't render */}
+            <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-700">
+              <span className="text-4xl text-gray-400 dark:text-gray-500">{flyer.store?.[0]}</span>
+            </div>
+          </object>
+        ) : firstPage?.image_url ? (
           <img
             src={firstPage.image_url}
             alt={flyer.name}
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
             <span className="text-4xl">{flyer.store?.[0]}</span>
           </div>
         )}
@@ -210,10 +222,10 @@ function FlyerCard({ flyer, onSelect, formatDate }) {
       {/* Info */}
       <div className="p-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-900 text-sm truncate">{flyer.name}</h3>
-          <span className="text-xs text-gray-400">{flyer.page_count || flyer.pages?.length} s</span>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">{flyer.name}</h3>
+          <span className="text-xs text-gray-400 dark:text-gray-500">{flyer.page_count || flyer.pages?.length} s</span>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           {formatDate(flyer.valid_from)} – {formatDate(flyer.valid_to)}
         </p>
       </div>
@@ -222,20 +234,29 @@ function FlyerCard({ flyer, onSelect, formatDate }) {
 }
 
 function InteractiveFlyerViewer({ flyer, onClose }) {
-  const { addItem, isInList } = useShoppingList()
+  const { addItem, isInList, getQuantity, items, updateQuantity } = useShoppingList()
   const [currentPage, setCurrentPage] = useState(0)
-  const [hoveredHotspot, setHoveredHotspot] = useState(null)
 
   const pages = flyer.pages?.sort((a, b) => a.page_number - b.page_number) || []
   const currentPageData = pages[currentPage]
-  const hotspots = currentPageData?.hotspots || []
 
-  const goToPage = (index) => {
+  // Get products for current page from hotspots
+  const products = currentPageData?.hotspots
+    ?.map(h => h.product)
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name, 'sv')) || []
+
+  // Get total product count across all pages
+  const totalProducts = pages.reduce(
+    (sum, p) => sum + (p.hotspots?.filter(h => h.product)?.length || 0),
+    0
+  )
+
+  const goToPage = useCallback((index) => {
     if (index >= 0 && index < pages.length) {
       setCurrentPage(index)
-      setHoveredHotspot(null)
     }
-  }
+  }, [pages.length])
 
   const handleAddToList = (product) => {
     if (product) {
@@ -243,143 +264,191 @@ function InteractiveFlyerViewer({ flyer, onClose }) {
     }
   }
 
+  const handleIncrement = (product, e) => {
+    e.stopPropagation()
+    addItem(product, 1)
+  }
+
+  const handleDecrement = (product, e) => {
+    e.stopPropagation()
+    const item = items.find(i => i.productId === product.id)
+    if (item) {
+      updateQuantity(item.id, item.quantity - 1)
+    }
+  }
+
+  // Always show products for current selected page
+  const displayProducts = products
+
+  // Group products by category
+  const productsByCategory = displayProducts.reduce((acc, product) => {
+    const category = product.category || 'Övrigt'
+    if (!acc[category]) acc[category] = []
+    acc[category].push(product)
+    return acc
+  }, {})
+
+  const categoryOrder = ['Kött', 'Fisk', 'Mejeri', 'Grönsaker', 'Frukt', 'Fryst', 'Skafferi', 'Bröd', 'Dryck', 'Snacks', 'Hygien', 'Övrigt']
+  const sortedCategories = Object.keys(productsByCategory).sort(
+    (a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
+  )
+
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between shrink-0">
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <span className={`w-3 h-3 rounded-full ${storeColors[flyer.store] || 'bg-gray-500'}`} />
-          <h2 className="font-semibold text-gray-900">{flyer.name}</h2>
-          <span className="text-sm text-gray-500">
-            Sida {currentPage + 1} av {pages.length}
+          <h2 className="font-semibold text-gray-900 dark:text-white">{flyer.name}</h2>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {pages.length} sidor
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
-            Klicka på produkter för att lägga till i inköpslistan
-          </span>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      {/* Flyer Content */}
-      <div className="flex-1 overflow-hidden flex items-center justify-center p-4">
-        <div className="relative max-h-full max-w-full">
-          {currentPageData?.image_url && (
+      {/* Main Content - Flyer + Product List */}
+      <div className="flex-1 overflow-hidden flex">
+        {/* Flyer Page Image */}
+        <div className="flex-1 bg-gray-900 overflow-hidden flex items-center justify-center p-4">
+          {currentPageData?.image_url ? (
             <img
               src={currentPageData.image_url}
               alt={`${flyer.name} - Sida ${currentPage + 1}`}
-              className="max-h-[calc(100vh-180px)] max-w-full object-contain"
-              style={{ display: 'block' }}
+              className="max-h-full max-w-full object-contain"
             />
+          ) : (
+            <div className="text-gray-400 dark:text-gray-500 text-center">
+              <p>Ingen bild tillgänglig för sida {currentPage + 1}</p>
+              <p className="text-sm mt-1">Sidan kan behöva konverteras på nytt</p>
+            </div>
           )}
+        </div>
 
-          {/* Hotspots overlay - positioned relative to the image */}
-          <div className="absolute inset-0">
-            {hotspots.map((hotspot) => {
-              const product = hotspot.product
-              if (!product) return null
+        {/* Product Sidebar */}
+        <div className="w-80 lg:w-96 bg-white dark:bg-gray-800 border-l dark:border-gray-700 flex flex-col">
+          <div className="px-4 py-3 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Produkter på sida {currentPage + 1}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {products.length} erbjudanden • {totalProducts} totalt
+            </p>
+          </div>
 
-              const inList = isInList(product.id)
-
-              return (
-                <div
-                  key={hotspot.id}
-                  className="absolute cursor-pointer transition-all"
-                  style={{
-                    left: `${hotspot.x}%`,
-                    top: `${hotspot.y}%`,
-                    width: `${hotspot.width}%`,
-                    height: `${hotspot.height}%`,
-                  }}
-                  onMouseEnter={() => setHoveredHotspot(hotspot.id)}
-                  onMouseLeave={() => setHoveredHotspot(null)}
-                  onClick={() => handleAddToList(product)}
-                >
-                  {/* Hotspot highlight */}
-                  <div className={`absolute inset-0 border-2 rounded transition-all ${
-                    hoveredHotspot === hotspot.id
-                      ? 'border-green-500 bg-green-500/30'
-                      : inList
-                      ? 'border-green-400 bg-green-400/20'
-                      : 'border-transparent hover:border-green-400/50 hover:bg-green-400/10'
-                  }`} />
-
-                  {/* Added badge */}
-                  {inList && hoveredHotspot !== hotspot.id && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-600 rounded-full flex items-center justify-center shadow">
-                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+          <div className="flex-1 overflow-y-auto">
+            {displayProducts.length === 0 ? (
+              <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                <p>Inga produkter på denna sida</p>
+                <p className="text-sm mt-1">Prova en annan sida</p>
+              </div>
+            ) : (
+              <div className="divide-y dark:divide-gray-700">
+                {sortedCategories.map(category => (
+                  <div key={category}>
+                    <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 sticky top-0">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        {category}
+                      </span>
                     </div>
-                  )}
-
-                  {/* Product tooltip */}
-                  {hoveredHotspot === hotspot.id && (
-                    <div className="absolute z-30 bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 pointer-events-none">
-                      <div className="bg-white rounded-lg shadow-xl border p-3">
-                        <p className="font-medium text-gray-900 text-sm leading-tight">
-                          {product.name}
-                        </p>
-                        <div className="flex items-baseline gap-1 mt-1">
-                          <span className="text-xl font-bold text-green-600">
-                            {product.price} kr
-                          </span>
-                          <span className="text-sm text-gray-400">
-                            /{product.unit || 'st'}
-                          </span>
-                        </div>
-                        {product.original_price && product.original_price > product.price && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-gray-400 line-through">
-                              {product.original_price} kr
-                            </span>
-                            <span className="text-sm font-medium text-red-600">
-                              -{Math.round((1 - product.price / product.original_price) * 100)}%
-                            </span>
+                    {productsByCategory[category].map(product => {
+                      const inList = isInList(product.id)
+                      const quantity = getQuantity(product.id)
+                      return (
+                        <div
+                          key={product.id}
+                          className={`px-4 py-3 flex items-center gap-3 transition-colors ${
+                            inList ? 'bg-green-50 dark:bg-green-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                              {product.name}
+                            </p>
+                            <div className="flex items-baseline gap-2 mt-0.5">
+                              <span className="text-lg font-bold text-green-600 dark:text-green-500">
+                                {product.price} kr
+                              </span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                /{product.unit || 'st'}
+                              </span>
+                              {product.original_price && product.original_price > product.price && (
+                                <>
+                                  <span className="text-xs text-gray-400 dark:text-gray-500 line-through">
+                                    {product.original_price} kr
+                                  </span>
+                                  <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                                    -{Math.round((1 - product.price / product.original_price) * 100)}%
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
-                        )}
-                        <div className={`mt-2 py-1.5 text-center text-sm font-medium rounded ${
-                          inList
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-green-600 text-white'
-                        }`}>
-                          {inList ? '✓ I inköpslistan' : 'Klicka för att lägga till'}
+
+                          {/* Quantity controls */}
+                          {inList ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => handleDecrement(product, e)}
+                                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                </svg>
+                              </button>
+                              <span className="w-8 text-center font-semibold text-gray-900 dark:text-white">
+                                {quantity}
+                              </span>
+                              <button
+                                onClick={(e) => handleIncrement(product, e)}
+                                className="w-8 h-8 rounded-full bg-green-600 text-white hover:bg-green-700 flex items-center justify-center transition-colors"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleAddToList(product)}
+                              className="shrink-0 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-500 flex items-center justify-center transition-all"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
-                      </div>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
-                        <div className="w-3 h-3 bg-white border-r border-b transform rotate-45 shadow" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Page Navigation */}
-      <div className="bg-white border-t px-4 py-3 flex items-center justify-center gap-4 shrink-0">
+      {/* Page Navigation - Click dots to select page and sync product sidebar */}
+      <div className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 px-4 py-3 flex items-center justify-center gap-4 shrink-0">
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 0}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        {/* Page dots */}
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 items-center">
           {pages.map((_, index) => (
             <button
               key={index}
@@ -387,8 +456,9 @@ function InteractiveFlyerViewer({ flyer, onClose }) {
               className={`h-2 rounded-full transition-all ${
                 index === currentPage
                   ? 'w-6 bg-green-600'
-                  : 'w-2 bg-gray-300 hover:bg-gray-400'
+                  : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
               }`}
+              title={`Sida ${index + 1}`}
             />
           ))}
         </div>
@@ -396,9 +466,9 @@ function InteractiveFlyerViewer({ flyer, onClose }) {
         <button
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === pages.length - 1}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>

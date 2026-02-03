@@ -2,10 +2,13 @@
 -- Run this in your Supabase SQL editor
 
 -- Table for user's favorite recipes
+-- Supports both regular recipes (recipe_id) and AI-generated meal plan recipes (meal_plan_recipe_id)
 CREATE TABLE IF NOT EXISTS recipe_favorites (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+  recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+  meal_plan_recipe_id INTEGER REFERENCES meal_plan_recipes(id) ON DELETE CASCADE,
+  recipe_data JSONB, -- Stores recipe data for meal plan recipes (denormalized for performance)
   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
   notes TEXT,
   times_made INTEGER DEFAULT 0,
@@ -13,13 +16,19 @@ CREATE TABLE IF NOT EXISTS recipe_favorites (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-  -- Ensure each user can only favorite a recipe once
-  UNIQUE(user_id, recipe_id)
+  -- Ensure at least one recipe reference is set
+  CONSTRAINT must_have_recipe CHECK (recipe_id IS NOT NULL OR meal_plan_recipe_id IS NOT NULL),
+
+  -- Ensure each user can only favorite a recipe once (for regular recipes)
+  UNIQUE(user_id, recipe_id),
+  -- Ensure each user can only favorite a meal plan recipe once
+  UNIQUE(user_id, meal_plan_recipe_id)
 );
 
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_recipe_favorites_user_id ON recipe_favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_favorites_recipe_id ON recipe_favorites(recipe_id);
+CREATE INDEX IF NOT EXISTS idx_recipe_favorites_meal_plan_recipe_id ON recipe_favorites(meal_plan_recipe_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_favorites_created_at ON recipe_favorites(created_at);
 
 -- Enable Row Level Security

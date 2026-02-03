@@ -271,7 +271,6 @@ const sampleMealPlan = {
 const sampleShoppingList = [
   {
     category: 'Kött & Fågel',
-    icon: '🥩',
     color: 'bg-red-50 border-red-200',
     items: [
       { name: 'Kycklingfilé', amount: '600', unit: 'g', price: 89, isOffer: true },
@@ -281,7 +280,6 @@ const sampleShoppingList = [
   },
   {
     category: 'Fisk & Skaldjur',
-    icon: '🐟',
     color: 'bg-blue-50 border-blue-200',
     items: [
       { name: 'Laxfilé', amount: '600', unit: 'g', price: 119, isOffer: true },
@@ -290,7 +288,6 @@ const sampleShoppingList = [
   },
   {
     category: 'Grönsaker',
-    icon: '🥕',
     color: 'bg-green-50 border-green-200',
     items: [
       { name: 'Potatis', amount: '2.4', unit: 'kg', price: 25, isOffer: true },
@@ -305,7 +302,6 @@ const sampleShoppingList = [
   },
   {
     category: 'Mejeri & Ägg',
-    icon: '🧈',
     color: 'bg-yellow-50 border-yellow-200',
     items: [
       { name: 'Grädde', amount: '2', unit: 'dl', price: 18, isOffer: false },
@@ -320,7 +316,6 @@ const sampleShoppingList = [
   },
   {
     category: 'Pasta, Ris & Bröd',
-    icon: '🍝',
     color: 'bg-orange-50 border-orange-200',
     items: [
       { name: 'Pasta penne', amount: '400', unit: 'g', price: 15, isOffer: true },
@@ -332,7 +327,6 @@ const sampleShoppingList = [
   },
   {
     category: 'Konserver & Skafferi',
-    icon: '🥫',
     color: 'bg-purple-50 border-purple-200',
     items: [
       { name: 'Krossade tomater', amount: '400', unit: 'g', price: 12, isOffer: true },
@@ -366,19 +360,12 @@ export default function DemoPage() {
   const checkedCount = Object.values(checkedItems).filter(Boolean).length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Banner */}
       <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-8 md:py-12">
         <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm mb-4">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-            Interaktivt exempel
-          </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Så här ser din matplan ut
+            Så här ser din veckomeny ut
           </h1>
           <p className="text-green-100 max-w-2xl mx-auto text-lg">
             Utforska ett exempel på en komplett veckomeny med recept och inköpslista.
@@ -388,28 +375,36 @@ export default function DemoPage() {
           {/* Quick Stats */}
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-              <span className="text-2xl">📅</span>
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <div className="text-left">
                 <p className="font-bold">7 dagar</p>
                 <p className="text-xs text-green-200">Komplett vecka</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-              <span className="text-2xl">💰</span>
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <div className="text-left">
                 <p className="font-bold">847 kr</p>
                 <p className="text-xs text-green-200">Total kostnad</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-              <span className="text-2xl">👨‍👩‍👧‍👦</span>
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
               <div className="text-left">
                 <p className="font-bold">4 pers</p>
                 <p className="text-xs text-green-200">Per måltid</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-              <span className="text-2xl">🏷️</span>
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
               <div className="text-left">
                 <p className="font-bold">~30 kr</p>
                 <p className="text-xs text-green-200">Per portion</p>
@@ -421,16 +416,18 @@ export default function DemoPage() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 bg-white p-2 rounded-xl shadow-sm max-w-md mx-auto">
+        <div className="flex gap-2 mb-8 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm max-w-md mx-auto">
           <button
             onClick={() => setActiveTab('recipes')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
               activeTab === 'recipes'
                 ? 'bg-green-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
           >
-            <span>🍽️</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
             Veckans recept
           </button>
           <button
@@ -438,10 +435,12 @@ export default function DemoPage() {
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
               activeTab === 'shopping'
                 ? 'bg-green-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
           >
-            <span>🛒</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
             Inköpslista
             {activeTab === 'shopping' && checkedCount > 0 && (
               <span className="bg-white text-green-600 text-xs px-2 py-0.5 rounded-full">
@@ -455,7 +454,7 @@ export default function DemoPage() {
         {activeTab === 'recipes' && (
           <section className="mb-16">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Veckans matplan</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Veckans veckomeny</h2>
               <p className="text-sm text-gray-500">Klicka på ett recept för detaljer</p>
             </div>
 
@@ -513,7 +512,6 @@ export default function DemoPage() {
                   className={`rounded-xl border-2 p-5 ${category.color}`}
                 >
                   <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">{category.icon}</span>
                     {category.category}
                     <span className="ml-auto text-sm font-normal text-gray-500">
                       {category.items.length} varor
@@ -586,12 +584,16 @@ export default function DemoPage() {
           <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
 
           <div className="relative z-10">
-            <span className="inline-block text-5xl mb-4">🎉</span>
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Gillar du vad du ser?
             </h2>
             <p className="text-green-100 mb-8 max-w-2xl mx-auto text-lg">
-              Skapa ett gratis konto och få personliga matplaner baserade på just <strong>dina</strong> preferenser
+              Skapa ett gratis konto och få personliga veckomenyer baserade på just <strong>dina</strong> preferenser
               och veckans bästa erbjudanden i <strong>din</strong> stad.
             </p>
 
@@ -621,7 +623,7 @@ export default function DemoPage() {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                2 matplaner per vecka
+                2 veckomenyer per vecka
               </span>
               <span className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -703,11 +705,15 @@ function RecipeCard({ recipe, isExpanded, onToggle }) {
                 <div className="text-right">
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
-                      <span>⏱️</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                       {recipe.prepTime} + {recipe.cookTime}
                     </span>
                     <span className="flex items-center gap-1">
-                      <span>👥</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
                       {recipe.servings} port
                     </span>
                     <span className="px-2 py-1 bg-gray-100 rounded text-xs">
@@ -735,8 +741,18 @@ function RecipeCard({ recipe, isExpanded, onToggle }) {
           <p className="text-gray-600 text-sm">{recipe.description}</p>
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-3 text-xs text-gray-500">
-              <span>⏱️ {recipe.prepTime} + {recipe.cookTime}</span>
-              <span>👥 {recipe.servings} port</span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {recipe.prepTime} + {recipe.cookTime}
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {recipe.servings} port
+              </span>
               <span className="px-2 py-0.5 bg-gray-100 rounded">{recipe.difficulty}</span>
             </div>
             <div className="text-right">
@@ -753,7 +769,10 @@ function RecipeCard({ recipe, isExpanded, onToggle }) {
             {/* Ingredients */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span>🥗</span> Ingredienser
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                Ingredienser
                 <span className="text-xs font-normal text-gray-400">({recipe.ingredients.length} st)</span>
               </h4>
               <ul className="space-y-2">
@@ -777,7 +796,10 @@ function RecipeCard({ recipe, isExpanded, onToggle }) {
             {/* Instructions */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span>👨‍🍳</span> Gör så här
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Gör så här
               </h4>
               <ol className="space-y-3">
                 {recipe.instructions.map((step, i) => (

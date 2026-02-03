@@ -11,6 +11,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
     "@google-cloud/vision": "^5.3.4",
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.93.3",
@@ -21,11 +22,15 @@
     "dotenv": "^17.2.3",
     "next": "16.1.6",
     "node-cron": "^4.2.1",
+    "pdf-to-img": "^5.0.0",
     "pdfjs-dist": "^5.4.624",
     "puppeteer": "^24.36.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "resend": "^6.9.1",
     "sharp": "^0.34.5",
+    "stripe": "^20.3.0",
+    "swr": "^2.4.0",
     "tesseract.js": "^7.0.0",
     "unpdf": "^1.4.0"
   },

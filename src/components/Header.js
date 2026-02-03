@@ -5,16 +5,18 @@ import { createClient } from '@/lib/supabase-browser'
 import Link from 'next/link'
 import LocationSelector from '@/components/LocationSelector'
 import { useShoppingList } from '@/contexts/ShoppingListContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export default function Header() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [selectedCity, setSelectedCity] = useState('Stockholm')
-  const dropdownRef = useRef(null)
+  const userMenuRef = useRef(null)
   const supabase = createClient()
   const { itemCount, openDrawer } = useShoppingList()
+  const { isDark, toggleTheme } = useTheme()
 
   // Load saved location
   useEffect(() => {
@@ -43,8 +45,8 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false)
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false)
       }
     }
 
@@ -55,6 +57,7 @@ export default function Header() {
   async function handleSignOut() {
     await supabase.auth.signOut()
     setMobileMenuOpen(false)
+    setUserMenuOpen(false)
     window.location.href = '/'
   }
 
@@ -76,12 +79,12 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <nav className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="text-xl md:text-2xl font-bold text-green-600">
-            🛒 Matvecka
+          <Link href="/" className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-500">
+            Matvecka
           </Link>
 
           {/* Desktop Navigation */}
@@ -96,7 +99,7 @@ export default function Header() {
             {/* Shopping Cart Button */}
             <button
               onClick={openDrawer}
-              className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+              className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -108,35 +111,57 @@ export default function Header() {
               )}
             </button>
 
-            <div className="w-px h-5 bg-gray-200" />
+            <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
 
             <Link
               href="/products"
-              className="text-gray-600 hover:text-green-600 transition-colors"
+              className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
             >
               Erbjudanden
+            </Link>
+
+            <Link
+              href="/meal-planner"
+              className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
+            >
+              Veckomeny
+            </Link>
+
+            <Link
+              href="/pricing"
+              className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
+            >
+              Priser
             </Link>
 
             {!loading && (
               <>
                 {user ? (
                   <>
+                    {/* Mina sidor Link */}
                     <Link
-                      href="/meal-planner"
-                      className="text-gray-600 hover:text-green-600 transition-colors"
+                      href="/dashboard"
+                      className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
                     >
-                      Matplanering
+                      Mina sidor
                     </Link>
 
-                    {/* Dropdown Menu */}
-                    <div className="relative" ref={dropdownRef}>
+                    {/* User Avatar with Dropdown */}
+                    <div className="relative ml-2 pl-4 border-l border-gray-200 dark:border-gray-700" ref={userMenuRef}>
                       <button
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                        className="flex items-center gap-1 text-gray-600 hover:text-green-600 transition-colors"
+                        onClick={() => setUserMenuOpen(!userMenuOpen)}
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                       >
-                        Mina sidor
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                          <span className="text-green-600 dark:text-green-400 font-semibold text-sm">
+                            {getUserInitials()}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 font-medium hidden lg:block max-w-[120px] truncate">
+                          {getUserDisplayName()}
+                        </span>
                         <svg
-                          className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                          className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -145,86 +170,90 @@ export default function Header() {
                         </svg>
                       </button>
 
-                      {dropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                      {userMenuOpen && (
+                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                          {/* Tools Section */}
+                          <div className="px-3 py-1.5">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Verktyg</p>
+                          </div>
                           <Link
-                            href="/dashboard"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                            href="/pantry"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
-                            <span className="text-xl">📊</span>
-                            <div>
-                              <p className="font-medium">Dashboard</p>
-                              <p className="text-xs text-gray-500">Översikt & statistik</p>
-                            </div>
+                            <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            Mitt Skafferi
                           </Link>
-
                           <Link
-                            href="/my-plans"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                            href="/nutrition"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
-                            <span className="text-xl">📋</span>
-                            <div>
-                              <p className="font-medium">Mina matplaner</p>
-                              <p className="text-xs text-gray-500">Se sparade planer</p>
-                            </div>
+                            <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Näringsspårning
                           </Link>
-
                           <Link
-                            href="/my-shopping-lists"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                            href="/leftovers"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
-                            <span className="text-xl">🛒</span>
-                            <div>
-                              <p className="font-medium">Mina inköpslistor</p>
-                              <p className="text-xs text-gray-500">Tidigare listor</p>
-                            </div>
+                            <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Resträtter
                           </Link>
-
-                          <div className="border-t border-gray-100 my-2"></div>
-
+                          <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                          {/* Dark Mode Toggle */}
+                          <button
+                            onClick={toggleTheme}
+                            className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
+                          >
+                            {isDark ? (
+                              <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                              </svg>
+                            )}
+                            {isDark ? 'Ljust läge' : 'Mörkt läge'}
+                          </button>
+                          <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                           <Link
                             href="/settings"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
-                            <span className="text-xl">⚙️</span>
-                            <div>
-                              <p className="font-medium">Inställningar</p>
-                              <p className="text-xs text-gray-500">Konto & preferenser</p>
-                            </div>
+                            <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Inställningar
                           </Link>
+                          <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                          <button
+                            onClick={handleSignOut}
+                            className="flex items-center gap-3 px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logga ut
+                          </button>
                         </div>
                       )}
-                    </div>
-
-                    {/* User section */}
-                    <div className="flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <span className="text-green-600 font-semibold text-sm">
-                            {getUserInitials()}
-                          </span>
-                        </div>
-                        <span className="text-sm text-gray-700 font-medium hidden lg:block max-w-[120px] truncate">
-                          {getUserDisplayName()}
-                        </span>
-                      </div>
-                      <button
-                        onClick={handleSignOut}
-                        className="text-sm text-gray-500 hover:text-red-600 transition-colors"
-                      >
-                        Logga ut
-                      </button>
                     </div>
                   </>
                 ) : (
                   <>
                     <Link
                       href="/login"
-                      className="text-gray-600 hover:text-green-600 transition-colors"
+                      className="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
                     >
                       Logga in
                     </Link>
@@ -244,7 +273,7 @@ export default function Header() {
           <div className="md:hidden flex items-center gap-1">
             <button
               onClick={openDrawer}
-              className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+              className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -257,7 +286,7 @@ export default function Header() {
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-gray-600 hover:text-green-600"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-500"
             >
             {mobileMenuOpen ? (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,11 +303,11 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4">
+          <div className="md:hidden border-t border-gray-100 dark:border-gray-700 py-4">
             <div className="flex flex-col space-y-1">
               {/* Mobile Location Selector */}
-              <div className="px-4 py-3 bg-gray-50 rounded-lg mx-2 mb-2">
-                <p className="text-xs font-medium text-gray-500 uppercase mb-2">Din plats</p>
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg mx-2 mb-2">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Din plats</p>
                 <LocationSelector
                   selectedCity={selectedCity}
                   onCityChange={setSelectedCity}
@@ -289,83 +318,115 @@ export default function Header() {
               <Link
                 href="/products"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
               >
-                🏷️ Erbjudanden
+                Erbjudanden
+              </Link>
+
+              <Link
+                href="/meal-planner"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              >
+                Veckomeny
+              </Link>
+
+              <Link
+                href="/pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              >
+                Priser
               </Link>
 
               {!loading && user ? (
                 <>
                   <Link
-                    href="/meal-planner"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                  >
-                    🍽️ Matplanering
-                  </Link>
-
-                  <div className="border-t border-gray-100 my-2"></div>
-                  <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">Mina sidor</p>
-
-                  <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
                   >
-                    📊 Dashboard
-                  </Link>
-                  <Link
-                    href="/my-plans"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                  >
-                    📋 Mina matplaner
-                  </Link>
-                  <Link
-                    href="/my-shopping-lists"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                  >
-                    🛒 Mina inköpslistor
-                  </Link>
-                  <Link
-                    href="/settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                  >
-                    ⚙️ Inställningar
+                    Mina sidor
                   </Link>
 
-                  <div className="border-t border-gray-100 my-2"></div>
+                  {/* Tools Section */}
+                  <div className="px-4 pt-3 pb-1">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Verktyg</p>
+                  </div>
+                  <Link
+                    href="/pantry"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    Mitt Skafferi
+                  </Link>
+                  <Link
+                    href="/nutrition"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Näringsspårning
+                  </Link>
+                  <Link
+                    href="/leftovers"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Resträtter
+                  </Link>
 
-                  <div className="px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <span className="text-green-600 font-semibold">
-                          {getUserInitials()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{getUserDisplayName()}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
-                      </div>
+                  <div className="border-t border-gray-100 dark:border-gray-700 my-2"></div>
+
+                  <div className="px-4 py-3 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 dark:text-green-400 font-semibold">
+                        {getUserInitials()}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 dark:text-white">{getUserDisplayName()}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                     </div>
                   </div>
 
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Inställningar
+                  </Link>
+
                   <button
                     onClick={handleSignOut}
-                    className="mx-4 py-3 text-red-600 hover:bg-red-50 rounded-lg text-left px-4"
+                    className="mx-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-left px-4 flex items-center gap-3"
                   >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                     Logga ut
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="border-t border-gray-100 my-2"></div>
+                  <div className="border-t border-gray-100 dark:border-gray-700 my-2"></div>
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
                   >
                     Logga in
                   </Link>

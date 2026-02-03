@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShoppingListProvider } from "@/contexts/ShoppingListContext";
 import { FavoritesProvider } from "@/lib/FavoritesContext";
+import { HouseholdProvider } from "@/contexts/HouseholdContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import FloatingCart from "@/components/FloatingCart";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import { ServiceWorkerProvider } from "@/hooks/useServiceWorker";
@@ -22,7 +24,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Matvecka - Smart matplanering",
-  description: "Spara tid och pengar på veckohandlingen med smarta matplaner baserade på veckans bästa erbjudanden från ICA, Coop och City Gross.",
+  description: "Spara tid och pengar på veckohandlingen med smarta veckomenyer baserade på veckans bästa erbjudanden från ICA, Coop och City Gross.",
   keywords: "matplanering, veckomeny, recept, erbjudanden, spara pengar, inköpslista, ICA, Coop, City Gross, Sverige",
   authors: [{ name: "Matvecka" }],
   metadataBase: new URL("https://matvecka.se"),
@@ -40,7 +42,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Matvecka - Smart matplanering",
-    description: "Spara tid och pengar på veckohandlingen med smarta matplaner.",
+    description: "Spara tid och pengar på veckohandlingen med smarta veckomenyer.",
     url: "https://matvecka.se",
     siteName: "Matvecka",
     locale: "sv_SE",
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Matvecka - Smart matplanering",
-    description: "Spara tid och pengar på veckohandlingen med smarta matplaner.",
+    description: "Spara tid och pengar på veckohandlingen med smarta veckomenyer.",
   },
   robots: {
     index: true,
@@ -81,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sv">
+    <html lang="sv" suppressHydrationWarning>
       <head>
         {/* PWA Additional Meta Tags */}
         <meta name="application-name" content="Matvecka" />
@@ -93,19 +95,23 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900`}
       >
-        <ServiceWorkerProvider>
-          <ShoppingListProvider>
-            <FavoritesProvider>
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <FloatingCart />
-              <PWAInstallPrompt />
-            </FavoritesProvider>
-          </ShoppingListProvider>
-        </ServiceWorkerProvider>
+        <ThemeProvider>
+          <ServiceWorkerProvider>
+            <ShoppingListProvider>
+              <FavoritesProvider>
+                <HouseholdProvider>
+                  <Header />
+                  <main className="flex-grow">{children}</main>
+                  <Footer />
+                  <FloatingCart />
+                  <PWAInstallPrompt />
+                </HouseholdProvider>
+              </FavoritesProvider>
+            </ShoppingListProvider>
+          </ServiceWorkerProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
