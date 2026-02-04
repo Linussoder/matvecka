@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 // Icons
@@ -78,7 +78,7 @@ const TABS = [
   { id: 'ai-tools', label: 'AI Tools', icon: SparklesIcon },
 ]
 
-export default function MarketingPage() {
+function MarketingContent() {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
   const [activeTab, setActiveTab] = useState(tabParam || 'dashboard')
@@ -496,5 +496,17 @@ export default function MarketingPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function MarketingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <MarketingContent />
+    </Suspense>
   )
 }

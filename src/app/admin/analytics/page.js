@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 // Icons
@@ -44,7 +44,7 @@ const TABS = [
   { id: 'experiments', label: 'A/B Tester', icon: BeakerIcon },
 ]
 
-export default function AdminAnalyticsPage() {
+function AnalyticsContent() {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
   const [activeTab, setActiveTab] = useState(tabParam || 'overview')
@@ -442,5 +442,17 @@ export default function AdminAnalyticsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function AdminAnalyticsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <AnalyticsContent />
+    </Suspense>
   )
 }
